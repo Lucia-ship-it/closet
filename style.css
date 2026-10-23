@@ -1,0 +1,388 @@
+/* Farby – tu sa dá jednoducho zmeniť vzhľad celej aplikácie */
+:root {
+  --bg: #faf8f6;
+  --card: #f1ece7;
+  --text: #1f1b18;
+  --muted: #7a716a;
+  --line: rgba(0, 0, 0, 0.08);
+  --accent: #c2647a;
+  --accent-soft: #f6e3e8;
+  --on-accent: #ffffff;
+  --checker: #e9e4df;
+  --radius: 20px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141211;
+    --card: #221f1d;
+    --text: #f3eeea;
+    --muted: #a29890;
+    --line: rgba(255, 255, 255, 0.1);
+    --accent: #e48aa0;
+    --accent-soft: #3a2229;
+    --on-accent: #1a0f12;
+    --checker: #2c2826;
+  }
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; }
+
+svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+main { flex: 1; min-height: 0; position: relative; }
+
+.screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
+}
+.screen.scroll { overflow-y: auto; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
+
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--card); }
+.text-btn { color: var(--accent); font-weight: 600; padding: 8px 0; }
+.small-btn { padding: 6px 12px; border-radius: 99px; background: var(--card); font-size: 14px; white-space: nowrap; }
+
+/* Prepínače (pilulky) */
+.pills { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+.pills::-webkit-scrollbar { display: none; }
+.pills button {
+  padding: 7px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.pills button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.pills.two-cols { display: grid; grid-template-columns: 1fr 1fr; }
+
+/* Outfit – swipovacie pásy */
+.outfit { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.outfit-row { flex: 1; min-height: 0; display: flex; gap: 8px; }
+.strip-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.strip {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  position: relative;
+}
+.strip::-webkit-scrollbar { display: none; }
+/* medzery na začiatku a konci, aby aj prvý/posledný kúsok bol v strede a susedné vykúkali */
+.strip::before, .strip::after { content: ""; flex: 0 0 calc(12% - 10px); }
+.slide {
+  flex: 0 0 76%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.slide img { max-width: 88%; max-height: 88%; object-fit: contain; }
+.strip.half::before, .strip.half::after { display: none; }
+.strip.half .slide { flex-basis: 100%; }
+
+.dots { display: flex; justify-content: center; gap: 5px; height: 16px; align-items: center; font-size: 12px; color: var(--muted); }
+.dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+.dots span.on { background: var(--text); }
+
+.empty {
+  flex: 1;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 14px;
+}
+.empty .plus { font-size: 30px; line-height: 1; color: var(--accent); }
+
+/* Šatník – mriežka */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-bottom: 80px; }
+.tile {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  background: var(--card);
+  display: grid;
+  place-items: center;
+  border: 2px solid transparent;
+  overflow: hidden;
+}
+.tile img { max-width: 86%; max-height: 86%; object-fit: contain; }
+.tile.picked { border-color: var(--accent); }
+.tile .badge {
+  position: absolute; top: 6px; right: 6px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: var(--on-accent);
+  font-size: 13px; display: grid; place-items: center; font-weight: 700;
+}
+.tile.deleting .badge { background: #d9534f; color: #fff; }
+.grid .empty { grid-column: 1 / -1; padding: 48px 16px; text-align: center; }
+.hint { font-size: 14px; color: var(--muted); margin: -4px 0 12px; }
+
+.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+  border-radius: 99px;
+  padding: 14px 20px;
+}
+.floating {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+/* Pridanie kúsku */
+.drop {
+  flex: 1;
+  max-height: 420px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+}
+.drop svg { width: 48px; height: 48px; color: var(--accent); }
+.drop span { color: var(--muted); font-size: 14px; max-width: 280px; }
+
+.preview {
+  position: relative;
+  height: 42vh;
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.preview img { max-width: 88%; max-height: 88%; object-fit: contain; transition: transform 0.15s; }
+.checker {
+  background-color: var(--card);
+  background-image: conic-gradient(var(--checker) 25%, transparent 0 50%, var(--checker) 0 75%, transparent 0);
+  background-size: 24px 24px;
+}
+.status {
+  position: absolute;
+  inset: auto 12px 12px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.segmented { display: grid; grid-template-columns: 1fr 1fr; background: var(--card); border-radius: 12px; padding: 3px; margin-bottom: 14px; }
+.segmented button { padding: 8px; border-radius: 10px; font-size: 14px; color: var(--muted); }
+.segmented button.on { background: var(--bg); color: var(--text); font-weight: 600; }
+
+.field { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; font-size: 15px; }
+.field input { flex: 1; accent-color: var(--accent); }
+.field-label { margin: 0 0 8px; font-size: 15px; }
+.error { color: #d9534f; font-size: 14px; margin: -6px 0 10px; }
+
+.actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 6px; }
+.actions button:first-child { border-radius: 99px; background: var(--card); padding: 14px; }
+
+/* Spodná lišta */
+.tabbar {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid var(--line);
+  padding: 6px 0 calc(env(safe-area-inset-bottom) + 6px);
+  background: var(--bg);
+}
+.tabbar button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--muted); padding: 4px 18px; }
+.tabbar button.on { color: var(--accent); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 80px);
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 99px;
+  font-size: 14px;
+  z-index: 10;
+}
+
+/* Complete view – the outfit placed on a silhouette */
+.head-actions { display: flex; align-items: center; gap: 8px; }
+.pill-btn { padding: 9px 16px; border-radius: 99px; background: var(--accent); color: var(--on-accent); font-weight: 600; font-size: 14px; }
+
+.figure {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--card);
+}
+.mannequin { position: relative; height: 100%; max-width: 100%; }
+.piece { position: absolute; display: block; }
+
+/* top on the left half, sweater on the right half */
+.clip { position: absolute; top: 0; bottom: 0; overflow: hidden; }
+.clip.left { left: 0; right: 50%; }
+.clip.right { left: 50%; right: 0; }
+.clip-inner { position: absolute; top: 0; height: 100%; width: 200%; }
+.clip.left .clip-inner { left: 0; }
+.clip.right .clip-inner { left: -100%; }
+
+/* Touch-up editor */
+.wide-btn { width: 100%; padding: 11px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 14px; font-size: 14px; color: var(--accent); font-weight: 600; }
+.editor { position: fixed; inset: 0; z-index: 20; background: var(--bg); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
+.ed-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; margin: 0; }
+.ed-view { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+.ed-view[data-tool="move"] { cursor: grab; }
+.ed-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.ed-stage canvas { display: block; }
+.ed-cursor { position: absolute; display: none; border: 1.5px solid var(--accent); border-radius: 50%; pointer-events: none; }
+.ed-panel { padding: 10px 16px calc(env(safe-area-inset-bottom) + 10px); border-top: 1px solid var(--line); }
+.ed-note { min-height: 18px; margin: 0 0 6px; font-size: 13px; color: var(--muted); text-align: center; }
+.segmented.three { grid-template-columns: repeat(3, 1fr); margin-bottom: 10px; }
+.ed-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ed-row .spacer { flex: 1; }
+.ed-panel .hint { margin: 8px 0 0; text-align: center; font-size: 13px; }
+.tile .badge.edit, .tile.deleting .badge.edit { left: 6px; right: auto; background: var(--accent); color: var(--on-accent); }
+
+.ed-row { gap: 6px; }
+.ed-row .small-btn { padding: 6px 10px; }
+
+/* Item sheet */
+.sheet { position: fixed; inset: 0; z-index: 15; display: flex; align-items: flex-end; }
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); }
+.sheet-panel { position: relative; width: 100%; background: var(--bg); border-radius: 24px 24px 0 0; padding: 16px 16px calc(env(safe-area-inset-bottom) + 12px); max-height: 92vh; overflow-y: auto; }
+.sheet-item { height: 28vh; border-radius: var(--radius); background: var(--card); display: grid; place-items: center; margin-bottom: 14px; }
+.sheet-item img { max-width: 80%; max-height: 23vh; object-fit: contain; }
+.wide-btn.danger { color: #d9534f; }
+.wide-btn.plain { color: var(--muted); font-weight: 400; margin-bottom: 0; border-color: transparent; }
+.hint.small { font-size: 12px; margin: -6px 0 14px; }
+
+.ed-panel .field { margin-bottom: 10px; }
+
+.field .value { min-width: 28px; text-align: right; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Closet: title, filters and hint stay at the top while the grid scrolls */
+#wardrobe { padding-top: 0; }
+.sticky-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0 -16px;
+  padding: calc(env(safe-area-inset-top) + 12px) 16px 6px;
+  background: var(--bg);
+}
+.sticky-head .pills { margin-bottom: 10px; }
+
+.complete-hint { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--muted); flex-shrink: 0; padding-top: 4px; }
+.adjust-bar { display: flex; align-items: center; justify-content: space-between; min-height: 36px; }
+.adjust-bar .pills { margin: 0; }
+.adjust-bar .pills button { padding: 5px 12px; font-size: 13px; }
+.adjust-bar .pills:empty + .text-btn { margin-left: auto; }
+.complete-hint .text-btn { padding: 4px 0; font-size: 14px; }
+.mannequin { cursor: grab; }
+
+/* Wide screens (browser on a computer): keep the app as a centred phone-sized column */
+html { background: var(--card); }
+body { max-width: 520px; margin: 0 auto; }
+@media (min-width: 600px) {
+  body { border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+}
+.editor { max-width: 520px; left: 0; right: 0; margin: 0 auto; }
+.sheet-panel { max-width: 520px; margin: 0 auto; }
+
+/* Saved outfits */
+.icon-btn.on svg { fill: var(--accent); stroke: var(--accent); }
+#saved { padding-top: 0; }
+.grid.two { grid-template-columns: repeat(2, 1fr); gap: 10px; padding-bottom: 24px; }
+.outfit-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  background: var(--card);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  overflow: hidden;
+}
+.outfit-card .mannequin { height: 100%; cursor: pointer; pointer-events: none; }
+.outfit-card .badge {
+  position: absolute; top: 6px; right: 6px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #d9534f; color: #fff;
+  font-size: 13px; display: grid; place-items: center; font-weight: 700;
+}
+.outfit-card .missing { font-size: 13px; color: var(--muted); text-align: center; }
+
+.notice { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 8px); z-index: 30; max-width: 496px; margin: 0 auto; padding: 12px 14px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); font-size: 14px; }
+
+/* Optional shoes row */
+.outfit-row.shoes { flex: 0.45; }
+
+#modes .pills { margin-bottom: 8px; }
+#modes { margin-bottom: 6px; }
+
+/* Closet filters wrap onto more lines, so every category is visible without scrolling sideways */
+#filters { flex-wrap: wrap; overflow-x: visible; }
+
+.figure { overflow: hidden; position: relative; }
+
+.selection { position: absolute; border: 1.5px dashed var(--accent); border-radius: 8px; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+.selection.show { opacity: 1; }

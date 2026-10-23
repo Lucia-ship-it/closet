@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#faf8f6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141211" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Closet">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css?v=33">
+  <title>Closet</title>
+</head>
+<body>
+  <main>
+    <!-- Obrazovka 1: skladanie outfitu -->
+    <section id="outfit" class="screen">
+      <header>
+        <h1>Outfit</h1>
+        <div class="head-actions">
+          <button id="complete" class="pill-btn">Complete</button>
+          <button id="save-outfit" class="icon-btn" aria-label="Save outfit" hidden>
+            <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+          </button>
+        </div>
+      </header>
+      <div id="modes">
+        <div class="pills">
+          <button data-base="tb">Top + bottom</button>
+          <button data-base="dress">Dress</button>
+        </div>
+        <div class="pills">
+          <button data-layer="sweater">+ Sweater</button>
+          <button data-layer="jacket">+ Jacket</button>
+          <button id="shoes-toggle">+ Shoes</button>
+        </div>
+      </div>
+      <div id="outfit-area" class="outfit"></div>
+    </section>
+
+    <!-- Obrazovka 2: celý šatník v mriežke -->
+    <section id="wardrobe" class="screen scroll" hidden>
+      <div class="sticky-head">
+      <header>
+        <h1>Closet</h1>
+        <button id="edit-toggle" class="text-btn">Edit</button>
+      </header>
+      <div id="filters" class="pills"></div>
+      <p id="edit-hint" class="hint" hidden>Tap an item to change its category, touch it up or delete it.</p>
+      </div>
+      <div id="grid" class="grid"></div>
+      <button id="wardrobe-go" class="primary floating" hidden>View outfit</button>
+    </section>
+
+    <!-- Saved outfits -->
+    <section id="saved" class="screen scroll" hidden>
+      <div class="sticky-head">
+        <header>
+          <h1>Saved</h1>
+          <button id="saved-edit" class="text-btn">Edit</button>
+        </header>
+      </div>
+      <div id="saved-grid" class="grid two"></div>
+    </section>
+
+    <!-- Obrazovka 3: pridanie nového kúsku -->
+    <section id="add" class="screen scroll" hidden>
+      <header><h1>New item</h1></header>
+
+      <label id="add-start" class="drop">
+        <input type="file" id="file" accept="image/*" hidden>
+        <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <strong>Take or choose a photo</strong>
+        <span>The background is removed automatically. It works best when the item lies flat and fully in view.</span>
+      </label>
+
+      <div id="add-review" hidden>
+        <div class="preview checker">
+          <img id="preview" alt="Item preview">
+          <div id="status" class="status" hidden></div>
+        </div>
+
+        <div id="source-toggle" class="segmented">
+          <button data-src="cutout">Cutout</button>
+          <button data-src="original">Original</button>
+        </div>
+
+        <button id="touch-up" class="wide-btn">Erase leftovers (hanger, floor…)</button>
+
+        <div class="field">
+          <span>Straighten</span>
+          <input type="range" id="rotate" min="-15" max="15" step="1" value="0">
+          <button id="rotate90" class="small-btn" aria-label="Rotate 90 degrees">↻ 90°</button>
+        </div>
+
+        <div class="field">
+          <span>Enhance</span>
+          <input type="range" id="enhance-pick" min="0" max="100" step="1" value="0">
+          <output id="enhance-value" class="value">0</output>
+        </div>
+        <p class="hint small">Evens out shadows and uneven light and freshens the colours. It can't iron out creases.</p>
+
+        <p class="field-label">Category</p>
+        <div id="cat-pick" class="pills two-cols"></div>
+        <p id="cat-error" class="error" hidden>Choose a category.</p>
+
+        <div class="actions">
+          <button id="cancel">Cancel</button>
+          <button id="save" class="primary">Save to closet</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button data-tab="outfit">
+      <svg viewBox="0 0 24 24"><path d="M10 6a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2v.5l8.4 6a1.4 1.4 0 0 1-.8 2.5H4.4a1.4 1.4 0 0 1-.8-2.5L12 9.5"/></svg>
+      Outfit
+    </button>
+    <button data-tab="wardrobe">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+      Closet
+    </button>
+    <button data-tab="saved">
+      <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+      Saved
+    </button>
+    <button data-tab="add">
+      <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      Add
+    </button>
+  </nav>
+
+  <div id="editor" class="editor" hidden>
+    <header class="ed-head">
+      <button id="ed-cancel" class="text-btn">Cancel</button>
+      <strong>Touch up</strong>
+      <button id="ed-done" class="text-btn">Done</button>
+    </header>
+    <div id="ed-view" class="ed-view checker">
+      <div id="ed-stage" class="ed-stage"><canvas id="ed-canvas"></canvas></div>
+      <div id="ed-cursor" class="ed-cursor"></div>
+    </div>
+    <div class="ed-panel">
+      <div id="ed-tools" class="segmented three">
+        <button data-tool="erase">Erase</button>
+        <button data-tool="restore">Restore</button>
+        <button data-tool="move">Move</button>
+      </div>
+      <div class="field">
+        <span>Brush</span>
+        <input type="range" id="ed-size" min="8" max="90" step="1" value="30">
+      </div>
+      <div class="field">
+        <span>Enhance</span>
+        <input type="range" id="ed-enhance" min="0" max="100" step="1" value="0">
+        <output id="ed-enhance-value" class="value">0</output>
+      </div>
+      <div class="ed-row">
+        <button id="ed-undo" class="small-btn">Undo</button>
+        <span class="spacer"></span>
+        <button id="ed-zoom-out" class="small-btn" aria-label="Zoom out">−</button>
+        <button id="ed-zoom-in" class="small-btn" aria-label="Zoom in">+</button>
+        <button id="ed-fit" class="small-btn">Fit</button>
+      </div>
+      <p class="hint">Pinch to zoom, two fingers move the photo.</p>
+    </div>
+  </div>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop"></div>
+    <div class="sheet-panel" role="dialog" aria-label="Edit item">
+      <div class="sheet-item"><img id="sheet-img" alt=""></div>
+      <p class="field-label">Category</p>
+      <div id="sheet-cats" class="pills two-cols"></div>
+      <button id="sheet-touch" class="wide-btn">Touch up photo</button>
+      <button id="sheet-delete" class="wide-btn danger">Delete</button>
+      <button id="sheet-close" class="wide-btn plain">Close</button>
+    </div>
+  </div>
+
+  <div id="notice" class="notice" role="alert" hidden></div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="app.js?v=33"></script>
+</body>
+</html>
