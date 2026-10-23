@@ -1,7 +1,7 @@
-import * as db from './db.js?v=33';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=33';
-import { editImage } from './editor.js?v=33';
-import { enhance } from './enhance.js?v=33';
+import * as db from './db.js?v=34';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=34';
+import { editImage } from './editor.js?v=34';
+import { enhance } from './enhance.js?v=34';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -23,7 +23,10 @@ const state = {
   shown: null, // the outfit currently shown in the Complete view
 };
 
-const add = { original: null, cutout: null, source: 'cutout', rotation: 0, cat: null, busy: false, token: 0, enhance: 0 };
+// New photos start with a light enhancement; the user can lower it to 0 or raise it.
+const DEFAULT_ENHANCE = 0.35;
+
+const add = { original: null, cutout: null, source: 'cutout', rotation: 0, cat: null, busy: false, token: 0, enhance: DEFAULT_ENHANCE };
 
 const $ = (s) => document.querySelector(s);
 
@@ -879,6 +882,7 @@ function renderAdd() {
     setPreview(blob, add.enhance);
   }
 
+  $('#retry-cutout').hidden = !add.cutout;
   $('#enhance-pick').value = Math.round(add.enhance * 100);
   $('#enhance-value').textContent = Math.round(add.enhance * 100);
   preview.style.transform = `rotate(${add.rotation}deg)`;
@@ -953,9 +957,33 @@ document.querySelectorAll('#source-toggle button').forEach((b) => {
   };
 });
 
+// A bigger background-removal model: slower and a larger one-time download, but better on
+// difficult photos (busy patterns, items that look like the floor).
+$('#retry-cutout').onclick = async () => {
+  if (add.busy || !add.original) return;
+  const token = add.token;
+  const original = add.original;
+  add.busy = true;
+  setStatus('Preparing…');
+  try {
+    const cutout = await removeBg(original, (text, pct) => {
+      if (token === add.token) setStatus(pct == null ? text : `${text} ${pct} %`);
+    }, 'medium');
+    if (token !== add.token) return;
+    add.cutout = cutout;
+    add.source = 'cutout';
+    setStatus(null);
+  } catch (err) {
+    console.error(err);
+    if (token === add.token) setStatus("Couldn't run the higher quality cutout. The earlier cutout is still there.");
+  }
+  if (token === add.token) add.busy = false;
+  renderAdd();
+};
+
 $('#touch-up').onclick = async () => {
   if (!add.cutout) return toast('The cutout is not ready yet.');
-  const edited = await editImage(add.cutout);
+  const edited = await editImage(add.cutout, { original: add.original });
   if (!edited) return;
   add.cutout = edited.blob;
   add.source = 'cutout';
@@ -988,6 +1016,8 @@ $('#rotate90').onclick = () => {
 function resetAdd() {
   add.token++;
   add.busy = false;
+  add.cat = null; // every new item starts without a category, so nothing is saved under the wrong one
+  add.enhance = DEFAULT_ENHANCE;
   add.original = null;
   add.cutout = null;
   add.rotation = 0;

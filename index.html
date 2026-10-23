@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#faf8f6" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#141211" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Closet">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css?v=33">
+  <link rel="stylesheet" href="style.css?v=34">
   <title>Closet</title>
 </head>
 <body>
@@ -89,6 +89,7 @@
         </div>
 
         <button id="touch-up" class="wide-btn">Erase leftovers (hanger, floor…)</button>
+        <button id="retry-cutout" class="wide-btn plain" hidden>Cutout not good? Try higher quality (larger download)</button>
 
         <div class="field">
           <span>Straighten</span>
@@ -167,6 +168,7 @@
         <button id="ed-fit" class="small-btn">Fit</button>
       </div>
       <p class="hint">Pinch to zoom, two fingers move the photo.</p>
+      <p id="ed-restore-note" class="hint" hidden>Restore also brings back parts of the original photo that were cut away.</p>
     </div>
   </div>
 
@@ -186,6 +188,6 @@
 
   <div id="toast" class="toast" hidden></div>
 
-  <script type="module" src="app.js?v=33"></script>
+  <script type="module" src="app.js?v=34"></script>
 </body>
 </html>

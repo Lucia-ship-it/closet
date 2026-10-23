@@ -1,11 +1,12 @@
 // Touch-up editor: erase leftovers (hanger, floor…), bring parts back and optionally enhance, with zoom and pan.
-// editImage(blob) resolves with { blob, enhanced } for the edited PNG, or null when nothing changed.
-import { enhance } from './enhance.js?v=33';
+// editImage(blob, { original }) resolves with { blob, enhanced } for the edited PNG, or null when nothing changed.
+// With `original` (the photo before background removal), Restore can bring back parts the removal cut away.
+import { enhance } from './enhance.js?v=34';
 
 const $ = (s) => document.querySelector(s);
 const MAX_ZOOM = 10;
 
-export async function editImage(blob) {
+export async function editImage(blob, { original } = {}) {
   const root = $('#editor');
   const view = $('#ed-view');
   const stage = $('#ed-stage');
@@ -14,19 +15,30 @@ export async function editImage(blob) {
   const sizeInput = $('#ed-size');
 
   const bmp = await createImageBitmap(blob);
+  const origBmp = original ? await createImageBitmap(original) : null;
   canvas.width = bmp.width;
   canvas.height = bmp.height;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-  // The mask holds everything that was erased. Strokes are kept as a list so undo is cheap.
-  const mask = document.createElement('canvas');
-  mask.width = bmp.width;
-  mask.height = bmp.height;
+  // Two masks: `mask` holds what was erased, `showMask` what was brought back from the original photo.
+  // Strokes are kept as a list so undo is cheap.
+  const makeMask = () => {
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    return c;
+  };
+  const mask = makeMask();
   const mctx = mask.getContext('2d');
+  const showMask = makeMask();
+  const sctx = showMask.getContext('2d');
+  const scratch = makeMask();
+  const xctx = scratch.getContext('2d');
   const strokes = [];
 
   // The picture being edited: the original, or an enhanced copy of it.
   let base = bmp;
+  let origBase = origBmp; // the original photo, enhanced together with the cutout
   let amount = 0;
   let inflight = Promise.resolve();
   let timer;
@@ -46,10 +58,30 @@ export async function editImage(blob) {
   const on = (target, type, fn, opts = {}) => target.addEventListener(type, fn, { ...opts, signal: ac.signal });
 
   root.hidden = false;
+  $('#ed-restore-note').hidden = !origBmp;
   setTool('erase');
   fitView();
 
   /* ----- drawing ----- */
+
+  // Puts the picture together: the cutout, plus the original photo where it was brought back,
+  // minus what was erased.
+  function compose() {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(base, 0, 0);
+    if (origBase && strokes.some((st) => st.mode === 'restore')) {
+      xctx.globalCompositeOperation = 'source-over';
+      xctx.clearRect(0, 0, scratch.width, scratch.height);
+      xctx.drawImage(origBase, 0, 0, scratch.width, scratch.height);
+      xctx.globalCompositeOperation = 'destination-in';
+      xctx.drawImage(showMask, 0, 0);
+      ctx.drawImage(scratch, 0, 0);
+    }
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.drawImage(mask, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+  }
 
   let queued = false;
   function render() {
@@ -57,35 +89,40 @@ export async function editImage(blob) {
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(base, 0, 0);
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.drawImage(mask, 0, 0);
-      ctx.globalCompositeOperation = 'source-over';
+      compose();
     });
   }
 
-  function paint(stroke, from, to) {
-    mctx.globalCompositeOperation = stroke.mode === 'erase' ? 'source-over' : 'destination-out';
-    mctx.fillStyle = mctx.strokeStyle = '#000';
-    mctx.lineCap = mctx.lineJoin = 'round';
-    mctx.lineWidth = stroke.size;
+  // Draws one dot or one line segment of a stroke on a mask, adding to it or cutting from it.
+  function stamp(c, add, size, from, to) {
+    c.globalCompositeOperation = add ? 'source-over' : 'destination-out';
+    c.fillStyle = c.strokeStyle = '#000';
+    c.lineCap = c.lineJoin = 'round';
+    c.lineWidth = size;
+    c.beginPath();
     if (!to) {
-      mctx.beginPath();
-      mctx.arc(from.x, from.y, stroke.size / 2, 0, Math.PI * 2);
-      mctx.fill();
+      c.arc(from.x, from.y, size / 2, 0, Math.PI * 2);
+      c.fill();
     } else {
-      mctx.beginPath();
-      mctx.moveTo(from.x, from.y);
-      mctx.lineTo(to.x, to.y);
-      mctx.stroke();
+      c.moveTo(from.x, from.y);
+      c.lineTo(to.x, to.y);
+      c.stroke();
     }
   }
 
+  // Erasing hides the spot and takes back anything restored there; restoring does the opposite.
+  // Without an original photo, restoring just undoes erasing.
+  function paint(stroke, from, to) {
+    const erase = stroke.mode === 'erase';
+    stamp(mctx, erase, stroke.size, from, to);
+    if (origBmp || erase) stamp(sctx, !erase, stroke.size, from, to);
+  }
+
   function rebuildMask() {
-    mctx.globalCompositeOperation = 'source-over';
-    mctx.clearRect(0, 0, mask.width, mask.height);
+    for (const [c, m] of [[mctx, mask], [sctx, showMask]]) {
+      c.globalCompositeOperation = 'source-over';
+      c.clearRect(0, 0, m.width, m.height);
+    }
     for (const st of strokes) {
       paint(st, st.pts[0]);
       for (let i = 1; i < st.pts.length; i++) paint(st, st.pts[i - 1], st.pts[i]);
@@ -246,19 +283,27 @@ export async function editImage(blob) {
   enhanceInput.value = 0;
   enhanceOut.textContent = '0';
 
-  function swapBase(next) {
+  function swapBase(next, nextOrig) {
     const old = base;
+    const oldOrig = origBase;
     base = next;
+    origBase = nextOrig;
     if (old !== bmp) old.close?.();
+    if (oldOrig && oldOrig !== origBmp) oldOrig.close?.();
     render();
   }
 
   async function applyEnhance(value) {
     amount = value;
-    if (!value) return swapBase(bmp);
+    if (!value) return swapBase(bmp, origBmp);
     const next = await createImageBitmap(await enhance(blob, value));
-    if (amount !== value) return next.close?.(); // the slider moved on meanwhile
-    swapBase(next);
+    const nextOrig = original ? await createImageBitmap(await enhance(original, value)) : null;
+    if (amount !== value) {
+      next.close?.(); // the slider moved on meanwhile
+      nextOrig?.close?.();
+      return;
+    }
+    swapBase(next, nextOrig);
   }
 
   const request = (value) => (inflight = applyEnhance(value));
@@ -292,7 +337,9 @@ export async function editImage(blob) {
       ac.abort();
       root.hidden = true;
       if (base !== bmp) base.close?.();
+      if (origBase && origBase !== origBmp) origBase.close?.();
       bmp.close?.();
+      origBmp?.close?.();
       resolve(result);
     };
     on($('#ed-cancel'), 'click', () => close(null));
@@ -301,13 +348,7 @@ export async function editImage(blob) {
       const wanted = Number(enhanceInput.value) / 100;
       if (wanted !== amount) request(wanted);
       await inflight;
-      // render() is queued in a frame; compose once more synchronously to be safe
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(base, 0, 0);
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.drawImage(mask, 0, 0);
-      ctx.globalCompositeOperation = 'source-over';
+      compose(); // render() is queued in a frame; compose once more synchronously to be safe
       canvas.toBlob((b) => close(strokes.length || amount ? { blob: b, enhanced: amount > 0 } : null), 'image/png');
     });
   });

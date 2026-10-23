@@ -339,7 +339,8 @@ h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
 .mannequin { cursor: grab; }
 
 /* Wide screens (browser on a computer): keep the app as a centred phone-sized column */
-html { background: var(--card); }
+html { background: var(--bg); }
+@media (min-width: 600px) { html { background: var(--card); } }
 body { max-width: 520px; margin: 0 auto; }
 @media (min-width: 600px) {
   body { border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
@@ -386,3 +387,5 @@ body { max-width: 520px; margin: 0 auto; }
 
 .selection { position: absolute; border: 1.5px dashed var(--accent); border-radius: 8px; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
 .selection.show { opacity: 1; }
+
+#retry-cutout { margin: -8px 0 14px; font-size: 13px; }

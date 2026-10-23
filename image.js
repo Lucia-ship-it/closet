@@ -26,11 +26,11 @@ export async function loadScaled(file) {
 let removerPromise;
 
 // onProgress(text, percent) – pri prvom použití sa sťahuje AI model (raz, potom je v pamäti).
-export async function removeBg(blob, onProgress) {
+export async function removeBg(blob, onProgress, model = 'small') {
   removerPromise ??= import(BG_REMOVAL_URL);
   const { removeBackground } = await removerPromise;
   return removeBackground(blob, {
-    model: 'small', // menší model – rýchlejšie stiahnutie a beh v mobile
+    model, // 'small' (default): quick download and run on a phone; 'medium': better, slower, bigger download
     output: { format: 'image/png' },
     progress: (key, current, total) => {
       const pct = total ? Math.round((current / total) * 100) : null;

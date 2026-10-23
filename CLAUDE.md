@@ -30,8 +30,8 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 33), e.g.
-  `sed -i '' 's/?v=33/?v=34/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 34), e.g.
+  `sed -i '' 's/?v=34/?v=35/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - `serve.py` is the local dev server (`python3 serve.py [port]`, serves its own folder, sends
   `Cache-Control: no-store`). Do not use `python3 -m http.server`.
@@ -39,6 +39,7 @@ sorts the items into categories and lets them put outfits together on one screen
   and `app.js` shows a visible notice ("another tab is open … your items are safe"). New
   database versions must only *add* stores, never delete data. The user once thought their
   items had vanished because of exactly this; they had not.
+- The viewport meta has **no `viewport-fit=cover`** on purpose: on the user's iPhone (home-screen app) the header and the pink button looked smeared because content sat under the system status-bar blur. Without `cover` the page starts below it. This was an educated fix and still needs the user's confirmation on the device.
 - The layout is a phone-width column (max 520px, centred) also on wide screens (user request).
 - Never ask the user to clear Safari website data: that deletes their wardrobe.
 
@@ -72,12 +73,16 @@ sorts the items into categories and lets them put outfits together on one screen
 
 **Add** – pick or take a photo → background removed automatically → choose category.
 Options: *Cutout / Original* toggle, *Straighten* slider + 90° button, **Enhance** slider
-(0–100, off by default, applied on save, not undoable), **Erase leftovers** opens the editor.
+(0–100, **starts at 35 for every new photo**, applied on save, not undoable), **Erase leftovers**
+opens the editor, and **Try higher quality** reruns the removal with the larger `medium` model
+(slower, larger one-time download; for difficult photos, e.g. a flowery skirt on a wooden floor).
+The category is **never pre-selected** (the user found a leftover choice confusing; an automatic
+guess would need an ML classifier, so it was not built).
 The cutout sometimes keeps a hanger or floor; the user wanted a manual fix, not auto-detection.
 
 **Touch-up editor** (`editor.js`, also reachable for saved items) – Erase / Restore / Move tools,
 brush size slider, Undo, zoom (pinch, wheel, + / − / Fit) and two-finger pan, Enhance slider.
-Strokes are kept as a list (cheap undo). *Restore* only brings back what the cutout had.
+Strokes are kept as a list (cheap undo). While adding a new item *Restore* paints back from the **original photo** (so parts the AI cut away can be recovered); for already saved items only the cutout is available, so Restore just undoes erasing.
 A "remove loose bits" button was built and then **removed at the user's request** (did not work well).
 
 **Outfit (strips view)** – rows of horizontally swipeable strips (scroll-snap): top and bottom
