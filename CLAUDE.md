@@ -138,9 +138,14 @@ multi-touch, Home Screen install) has **not** been verified by me; say so.
 
 ## Ideas not done yet
 
-- **Export / import backup** (single file with all items and outfits). Important before publishing:
-  data belongs to the page address, so moving from `localhost` to `github.io` starts empty.
-  The address must not change later (renaming the repo or account would lose the data).
+- **Backup / sync across devices, and later user accounts.** Decision (user): **postponed**.
+  Today every device has its own separate wardrobe (data lives in the browser, tied to the page
+  address; moving from `localhost` to `github.io` starts empty, and the address must never change).
+  The user's longer-term idea: a few users who log in and find their items on several devices.
+  That needs a **backend** (sign-in plus storage for photos and outfits, e.g. Firebase or
+  Supabase), which GitHub Pages cannot provide. Keep the data model (`items`, `outfits`,
+  adjustments) simple and serialisable so it can be synced or exported later, and keep the app
+  working offline from IndexedDB (local-first). A plain export/import file is the cheap first step.
 - Shoes could follow the bottoms automatically when those are resized.
 - Two layers at once (sweater and jacket), which needs a different half-and-half display.
 - Skirt filter/tag inside Bottoms.
