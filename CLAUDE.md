@@ -30,8 +30,8 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 34), e.g.
-  `sed -i '' 's/?v=34/?v=35/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 36), e.g.
+  `sed -i '' 's/?v=36/?v=37/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - `serve.py` is the local dev server (`python3 serve.py [port]`, serves its own folder, sends
   `Cache-Control: no-store`). Do not use `python3 -m http.server`.
@@ -106,7 +106,7 @@ Decisions, in order they were made:
 
 **Hand adjustment** (`setUpAdjust`) – tap a piece in the picture to select it (hit test uses the
 picture's transparency, topmost wins); drag to move, pinch / wheel to resize (about the shoulder
-line; shoes and bottoms about their top centre). Nothing is selected at first; **tapping outside
+line; shoes and bottoms about their top centre). Made forgiving for fingers (small pieces such as shoes were hard to grab): a touch that lands within about 20px of a piece's visible pixels selects it; once a piece is selected it can be dragged or pinched from anywhere, and the selection is only cleared by a plain *tap* on empty space (not by a drag or pinch); the selected piece also has **− / +** buttons under the picture for resizing without pinching. Nothing is selected at first; **tapping outside
 deselects** (user request) and nothing can be moved without a selection. A dashed frame shows the
 selection; buttons under the picture (Bottom / Top / Sweater / Jacket / Dress / Shoes) are the
 alternative way to select. **Pieces cannot leave the grey outfit card** (`keepInside`).

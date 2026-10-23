@@ -1,7 +1,7 @@
-import * as db from './db.js?v=34';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=34';
-import { editImage } from './editor.js?v=34';
-import { enhance } from './enhance.js?v=34';
+import * as db from './db.js?v=36';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=36';
+import { editImage } from './editor.js?v=36';
+import { enhance } from './enhance.js?v=36';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -389,6 +389,29 @@ function setUpAdjust(body, hint, pieces, totalH) {
     return null;
   };
 
+  // Fingers are bigger than small pieces such as shoes, so a touch that lands just beside a piece
+  // still counts: look in a few rings around the point, nearest first.
+  const pieceNear = (x, y) => {
+    for (const r of [0, 10, 20]) {
+      const steps = r ? 8 : 1;
+      for (let i = 0; i < steps; i++) {
+        const a = (i / steps) * Math.PI * 2;
+        const hit = pieceAt(x + Math.cos(a) * r, y + Math.sin(a) * r);
+        if (hit) return hit;
+      }
+    }
+    return null;
+  };
+
+  // The selected piece can be grabbed anywhere inside (and a little around) its frame.
+  const insideFrame = (p, x, y, margin = 14) => {
+    const r = p.img.getBoundingClientRect();
+    const clip = p.img.closest('.clip')?.getBoundingClientRect(); // only the visible half of a half-piece
+    const left = Math.max(r.left, clip?.left ?? -Infinity) - margin;
+    const right = Math.min(r.right, clip?.right ?? Infinity) + margin;
+    return x >= left && x <= right && y >= r.top - margin && y <= r.bottom + margin;
+  };
+
   // Keeps a piece fully inside the outfit area (the grey card), however it is moved or resized.
   const bounds = () => {
     const card = body.parentElement.getBoundingClientRect();
@@ -413,9 +436,17 @@ function setUpAdjust(body, hint, pieces, totalH) {
   const pick = el('div', 'pills');
   const reset = el('button', 'text-btn', 'Reset');
   const note = el('span', '');
+  // Resizing with buttons is easier than pinching on a small piece.
+  const sizeBtns = el('div', 'size-btns');
+  const smaller = el('button', 'small-btn', '−');
+  const bigger = el('button', 'small-btn', '+');
+  smaller.setAttribute('aria-label', 'Smaller');
+  bigger.setAttribute('aria-label', 'Bigger');
+  sizeBtns.append(smaller, bigger);
   const refresh = () => {
     pick.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', pieces[i] === active));
     reset.hidden = !active || isDefault(active.adj);
+    sizeBtns.hidden = !active;
     note.textContent = active
       ? `${active.label} selected. Drag to move, pinch to resize, tap outside to deselect.`
       : 'Tap a piece to adjust it.';
@@ -433,7 +464,7 @@ function setUpAdjust(body, hint, pieces, totalH) {
       pick.append(b);
     }
   }
-  bar.append(pick, reset);
+  bar.append(pick, sizeBtns, reset);
   hint.append(bar, note);
 
   const store = (p) => {
@@ -442,6 +473,17 @@ function setUpAdjust(body, hint, pieces, totalH) {
     saveAdjusts();
     updateHeart();
   };
+
+  const resize = (factor) => {
+    if (!active) return;
+    active.adj.scale = clamp(active.adj.scale * factor, 0.4, 2.5);
+    keepInside(active);
+    place(active);
+    refresh();
+    store(active);
+  };
+  smaller.onclick = () => resize(1 / 1.15);
+  bigger.onclick = () => resize(1.15);
 
   reset.onclick = () => {
     if (!active) return;
@@ -453,13 +495,30 @@ function setUpAdjust(body, hint, pieces, totalH) {
 
   const pointers = new Map();
   let pinch = null;
+  let tapOutside = null;
   const unit = () => body.getBoundingClientRect().width / FIG_W; // screen pixels per figure unit
 
   body.style.touchAction = 'none';
   body.addEventListener('pointerdown', (e) => {
-    body.setPointerCapture(e.pointerId);
+    try {
+      body.setPointerCapture(e.pointerId);
+    } catch {
+      // not a capturable pointer (e.g. it already ended); the gesture still works without capture
+    }
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pointers.size === 1) select(pieceAt(e.clientX, e.clientY)); // outside every piece: nothing selected
+    if (pointers.size === 1) {
+      const hit = pieceNear(e.clientX, e.clientY) ?? (active && insideFrame(active, e.clientX, e.clientY) ? active : null);
+      if (hit) {
+        tapOutside = null;
+        select(hit);
+      } else {
+        // Touching empty space only deselects if it stays a tap: dragging or pinching with a
+        // selection keeps working, so the fingers do not have to land exactly on a small piece.
+        tapOutside = { x: e.clientX, y: e.clientY };
+      }
+    } else {
+      tapOutside = null;
+    }
     if (pointers.size === 2 && active) {
       const [a, b] = [...pointers.values()];
       pinch = { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, scale: active.adj.scale };
@@ -469,6 +528,7 @@ function setUpAdjust(body, hint, pieces, totalH) {
     const last = pointers.get(e.pointerId);
     if (!last) return;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (tapOutside && Math.hypot(e.clientX - tapOutside.x, e.clientY - tapOutside.y) > 8) tapOutside = null;
     if (!active) return;
     const adj = active.adj;
     if (pointers.size === 2 && pinch) {
@@ -486,6 +546,8 @@ function setUpAdjust(body, hint, pieces, totalH) {
     if (!pointers.delete(e.pointerId)) return;
     if (pointers.size < 2) pinch = null;
     if (pointers.size === 0 && active) store(active);
+    if (pointers.size === 0 && tapOutside && e.type === 'pointerup') select(null); // a plain tap on empty space
+    if (pointers.size === 0) tapOutside = null;
   };
   body.addEventListener('pointerup', release);
   body.addEventListener('pointercancel', release);

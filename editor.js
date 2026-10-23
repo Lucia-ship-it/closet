@@ -1,7 +1,7 @@
 // Touch-up editor: erase leftovers (hanger, floor…), bring parts back and optionally enhance, with zoom and pan.
 // editImage(blob, { original }) resolves with { blob, enhanced } for the edited PNG, or null when nothing changed.
 // With `original` (the photo before background removal), Restore can bring back parts the removal cut away.
-import { enhance } from './enhance.js?v=34';
+import { enhance } from './enhance.js?v=36';
 
 const $ = (s) => document.querySelector(s);
 const MAX_ZOOM = 10;
