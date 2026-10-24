@@ -48,7 +48,16 @@ features she needs herself.
   empty. Do such changes early, while there is little data, and ideally after an export/backup exists.
   All links in the code are relative, so a rename breaks nothing in the code itself; update the
   URLs in these notes and in `README.md`.
-  **Decision (user): the address stays `https://lucia-ship-it.github.io/closet/`.**
+  **Decision (user): for now the address stays `https://lucia-ship-it.github.io/closet/`. This is
+  temporary: if she decides to charge for the app and grow it, she plans to buy a domain.**
+  Plan for that day (remind her before it happens): (1) build **export / import of the wardrobe first**,
+  because a custom domain is a new origin and starts empty, and once GitHub Pages is set to the
+  custom domain the old `github.io` address redirects to it, so nobody can export from the old
+  address any more; (2) tell existing users to export before the switch; (3) buy the domain, add it
+  in *Settings → Pages* (a `CNAME` file and DNS records), and update the URLs in these notes and in
+  `README.md`; (4) the Home Screen icon has to be added again on the new address; (5) do the
+  licence check from "Before any monetisation" first. A sign-in plus cloud storage (see "Ideas")
+  would make the move painless.
 - **I cannot push** (GitHub asks for a login I must not enter). Workflow: I make the change, test it,
   bump the `?v=NN` number, **commit locally**, and tell the user to push from VS Code
   (*Source Control → Sync Changes*). Pages updates a minute or two after the push; the installed
