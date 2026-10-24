@@ -3,6 +3,18 @@
 Read this first. It explains what the app is, who it is for, how it is built, and every
 decision made so far, so work can continue without the original conversation.
 
+## Before any monetisation (the user asked for this reminder)
+
+**If the user ever talks about charging for the app (a fee, subscription, donations platform, ads),
+stop and remind them first**: the app uses third-party code and models whose licences were never
+cleared for commercial use. Then **check every dependency again**, not only the one known below:
+the libraries and models loaded at runtime (see `image.js`, currently `@imgly/background-removal`
+via esm.sh, which is **AGPL-3.0**, plus the model files it downloads), any fonts, icons or
+scripts added later, and the licences of everything the page fetches from other sites.
+Report each one with its licence and what it means for selling, and recommend legal advice
+(she is not a lawyer and neither am I). Also mention the practical side raised earlier: tax and
+VAT, terms and privacy policy, and the platform fees (Buy Me a Coffee takes about 5%).
+
 ## What this is
 
 A personal **wardrobe / outfit-planning web app**, built by "vibe coding" with a non-developer
@@ -30,8 +42,8 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 42), e.g.
-  `sed -i '' 's/?v=42/?v=43/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 43), e.g.
+  `sed -i '' 's/?v=43/?v=44/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
   keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
@@ -52,6 +64,7 @@ sorts the items into categories and lets them put outfits together on one screen
 - The smeared header **persisted on the user's iPhone SE (3rd gen, no notch) after `viewport-fit=cover` was removed**, so a second, targeted workaround is in `style.css`: `--top-clear` (12px normally, 46px for a Home Screen app on a short screen, `display-mode: standalone` and `max-height: 700px`) is the space above every header. It was a guess from screenshots, **confirmed working by the user on their iPhone SE 3** (the header is no longer smeared). Keep it unless a new device shows a problem.
 - The layout is a phone-width column (max 520px, centred) also on wide screens (user request).
 - **Third-party licence to keep in mind:** background removal uses `@imgly/background-removal`, which is licensed **AGPL-3.0** (its README: "free for use under the AGPL License"; other licensing on request from IMG.LY, support@img.ly). It is loaded unmodified from esm.sh at runtime. How AGPL interacts with this app's own *All rights reserved* licence, and with any plan to charge money, was **not** settled (it is a legal question; the user was told to get advice or a commercial licence, or to switch library). Credit the library visibly if a credits line is added.
+- **Credits line** at the bottom of Closet: "© 2026 luci.k. All rights reserved." and a credit for IMG.LY (AGPL-3.0). The display name `luci.k` is a trial the user wants to look at before deciding to keep it (`LICENSE` still names `Lucia-ship-it`; make them match if she keeps it).
 - **Licence:** `LICENSE` says *All rights reserved* (user decision: the code may be read but not copied or reused). The repository stays **public** for now (GitHub Pages is free only for public repositories); making it private was discussed and postponed. Selling the app (e.g. a small fee) was discussed only theoretically; the notes on it: a static page cannot enforce payment, so charging needs a backend with sign-in, which fits the later cloud-sync idea (storage costs money, so paying for sync is the natural model).
 - Never ask the user to clear Safari website data: that deletes their wardrobe.
 
