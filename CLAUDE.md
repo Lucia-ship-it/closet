@@ -49,7 +49,7 @@ sorts the items into categories and lets them put outfits together on one screen
   keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
   fetches `index.html` with `no-store`, compares its `app.js?v=NN` with the running version
   (`import.meta.url`), and if newer it reloads via a never-seen URL (`./?u=NN`); when the app comes
-  back to the foreground it shows an "Update" bar instead. *Check for updates* is a small text button at the **bottom of the Add screen**, above the credits line (an About slide-in sheet was tried and the user disliked it; Add is short, so no scrolling).
+  back to the foreground it shows an "Update" bar instead. *Check for updates* is a small text button at the **bottom of the Add screen**, above the credits line (an About slide-in sheet was tried and the user disliked it; Add is short, so no scrolling). **Decided by the user: it stays there.** The answer is shown on the button itself for 3 seconds (a toast would cover the footer).
   version number is **deliberately not shown to users** (user request); it is available as
   `document.documentElement.dataset.version` and in the script URL.
   **Never tell the user to delete the Home Screen icon or clear website data** to update: the
