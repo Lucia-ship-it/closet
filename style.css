@@ -412,5 +412,5 @@ body { max-width: 520px; margin: 0 auto; }
   :root { --top-clear: 46px; }
 }
 
-.credits { text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); margin: 0 0 90px; }
+.credits { text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); margin: 0 0 90px; white-space: nowrap; }
 .credits a { color: inherit; text-decoration: underline; }
