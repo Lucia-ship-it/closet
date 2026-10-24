@@ -42,14 +42,14 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 47), e.g.
-  `sed -i '' 's/?v=47/?v=48/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 49), e.g.
+  `sed -i '' 's/?v=49/?v=50/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
   keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
   fetches `index.html` with `no-store`, compares its `app.js?v=NN` with the running version
   (`import.meta.url`), and if newer it reloads via a never-seen URL (`./?u=NN`); when the app comes
-  back to the foreground it shows an "Update" bar instead. The *Check for updates* button is a small refresh icon next to the title on the **Outfit** screen (the most used screen; the user did not want it at the bottom of Closet, where long lists mean a lot of scrolling). The
+  back to the foreground it shows an "Update" bar instead. *Check for updates* lives in the **About** sheet (info icon next to the title on the Outfit screen; the user did not want it at the bottom of Closet, where long lists mean a lot of scrolling).
   version number is **deliberately not shown to users** (user request); it is available as
   `document.documentElement.dataset.version` and in the script URL.
   **Never tell the user to delete the Home Screen icon or clear website data** to update: the
@@ -64,7 +64,7 @@ sorts the items into categories and lets them put outfits together on one screen
 - The smeared header **persisted on the user's iPhone SE (3rd gen, no notch) after `viewport-fit=cover` was removed**, so a second, targeted workaround is in `style.css`: `--top-clear` (12px normally, 46px for a Home Screen app on a short screen, `display-mode: standalone` and `max-height: 700px`) is the space above every header. It was a guess from screenshots, **confirmed working by the user on their iPhone SE 3** (the header is no longer smeared). Keep it unless a new device shows a problem.
 - The layout is a phone-width column (max 520px, centred) also on wide screens (user request).
 - **Third-party licence to keep in mind:** background removal uses `@imgly/background-removal`, which is licensed **AGPL-3.0** (its README: "free for use under the AGPL License"; other licensing on request from IMG.LY, support@img.ly). It is loaded unmodified from esm.sh at runtime. How AGPL interacts with this app's own *All rights reserved* licence, and with any plan to charge money, was **not** settled (it is a legal question; the user was told to get advice or a commercial licence, or to switch library). Credit the library visibly if a credits line is added.
-- **Credits line** at the bottom of Closet, one line, plain text: "© 2026 luci.k · Cutouts by IMG.LY (AGPL-3.0)" (the user removed "All rights reserved" from the screen, shortened the credit and wanted no link; the library credit stays because of its licence). The display name `luci.k` is a trial the user wants to look at before deciding to keep it; `LICENSE` in the repository still says *All rights reserved* and names `Lucia-ship-it` (make the name match if she keeps `luci.k`).
+- **About sheet** (info icon next to the title on Outfit): title, credit line "© 2026 luci.k · Cutouts by IMG.LY (AGPL-3.0)" (plain text, no link, no "All rights reserved" on screen; the library credit stays because of its licence), the local-storage note and *Check for updates*. The display name `luci.k` is a trial the user wants to look at before deciding to keep it; `LICENSE` in the repository still says *All rights reserved* and names `Lucia-ship-it` (make the name match if she keeps `luci.k`).
 - **Licence:** `LICENSE` says *All rights reserved* (user decision: the code may be read but not copied or reused). The repository stays **public** for now (GitHub Pages is free only for public repositories); making it private was discussed and postponed. Selling the app (e.g. a small fee) was discussed only theoretically; the notes on it: a static page cannot enforce payment, so charging needs a backend with sign-in, which fits the later cloud-sync idea (storage costs money, so paying for sync is the natural model).
 - Never ask the user to clear Safari website data: that deletes their wardrobe.
 

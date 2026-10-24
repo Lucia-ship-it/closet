@@ -1,7 +1,7 @@
-import * as db from './db.js?v=47';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=47';
-import { editImage } from './editor.js?v=47';
-import { enhance } from './enhance.js?v=47';
+import * as db from './db.js?v=49';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=49';
+import { editImage } from './editor.js?v=49';
+import { enhance } from './enhance.js?v=49';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -856,7 +856,7 @@ async function changeCategory(item, cat) {
 }
 
 $('#sheet-close').onclick = closeSheet;
-document.querySelector('.sheet-backdrop').onclick = closeSheet;
+document.querySelector('#sheet .sheet-backdrop').onclick = closeSheet;
 $('#sheet-touch').onclick = () => {
   const item = sheetItem;
   closeSheet();
@@ -1165,6 +1165,12 @@ function loadVersion(version) {
   location.replace(`./?u=${version}`);
 }
 
+// Inside the About sheet the answer is written under the button (a toast would cover it).
+function say(text) {
+  if ($('#about').hidden) return toast(text);
+  $('#about-status').textContent = text;
+}
+
 async function checkForUpdate({ manual = false } = {}) {
   const latest = await latestVersion();
   if (latest && latest > RUNNING_VERSION) {
@@ -1181,7 +1187,7 @@ async function checkForUpdate({ manual = false } = {}) {
     if (tried === String(latest)) return showUpdate(latest);
     return loadVersion(latest);
   }
-  if (manual) toast(latest ? 'You have the latest version' : "Couldn't check for updates");
+  if (manual) say(latest ? 'You have the latest version' : "Couldn't check for updates");
 }
 
 function showUpdate(version) {
@@ -1192,6 +1198,15 @@ function showUpdate(version) {
 
 document.documentElement.dataset.version = String(RUNNING_VERSION); // not shown to users; handy when debugging
 $('#check-update').onclick = () => checkForUpdate({ manual: true });
+
+// About: credits, the storage note and the update check, kept out of the main screens
+const openAbout = (open) => {
+  $('#about').hidden = !open;
+  $('#about-status').textContent = '';
+};
+$('#about-open').onclick = () => openAbout(true);
+$('#about-close').onclick = () => openAbout(false);
+document.querySelector('#about .sheet-backdrop').onclick = () => openAbout(false);
 // coming back to the app after a while: look for a newer version, but let the user choose when to reload
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible') return;

@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Closet">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css?v=47">
+  <link rel="stylesheet" href="style.css?v=49">
   <title>Closet</title>
 </head>
 <body>
@@ -21,8 +21,8 @@
       <header>
         <div class="title-row">
           <h1>Outfit</h1>
-          <button id="check-update" class="icon-btn small" aria-label="Check for updates" title="Check for updates">
-            <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-3M4 5v3h3M4 13a8 8 0 0 0 14.9 3M20 19v-3h-3"/></svg>
+          <button id="about-open" class="icon-btn small" aria-label="About Closet" title="About">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
           </button>
         </div>
         <div class="head-actions">
@@ -57,7 +57,6 @@
       <p id="edit-hint" class="hint" hidden>Tap an item to change its category, touch it up or delete it.</p>
       </div>
       <div id="grid" class="grid"></div>
-      <p class="credits">© 2026 luci.k · Cutouts by IMG.LY (AGPL-3.0)</p>
       <button id="wardrobe-go" class="primary floating" hidden>View outfit</button>
     </section>
 
@@ -196,12 +195,28 @@
     </div>
   </div>
 
+  <div id="about" class="sheet" hidden>
+    <div class="sheet-backdrop"></div>
+    <div class="sheet-panel" role="dialog" aria-label="About Closet">
+      <h2 class="about-title">Closet</h2>
+      <p class="about-credit">© 2026 luci.k · Cutouts by IMG.LY (AGPL-3.0)</p>
+      <p class="note">
+        <strong>Your closet lives on this device only.</strong>
+        Photos and outfits are saved in this app, not online. If you delete the app from your Home Screen
+        or clear the website data, they are gone.
+      </p>
+      <button id="check-update" class="wide-btn">Check for updates</button>
+      <p id="about-status" class="about-status" role="status"></p>
+      <button id="about-close" class="wide-btn plain">Close</button>
+    </div>
+  </div>
+
   <div id="update-bar" class="notice update" hidden>A new version is ready. <button id="update-now" class="text-btn">Update</button></div>
 
   <div id="notice" class="notice" role="alert" hidden></div>
 
   <div id="toast" class="toast" hidden></div>
 
-  <script type="module" src="app.js?v=47"></script>
+  <script type="module" src="app.js?v=49"></script>
 </body>
 </html>

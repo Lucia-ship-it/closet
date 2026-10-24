@@ -259,7 +259,7 @@ h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
   padding: 10px 18px;
   border-radius: 99px;
   font-size: 14px;
-  z-index: 10;
+  z-index: 40; /* above the sheets */
   width: max-content; /* one line; only a very long message wraps */
   max-width: calc(100vw - 32px);
   text-align: center;
@@ -411,10 +411,14 @@ body { max-width: 520px; margin: 0 auto; }
   :root { --top-clear: 46px; }
 }
 
-.credits { text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); margin: auto 0 12px; white-space: nowrap; } /* auto: at the bottom of a short screen */
-/* room for the floating View outfit button while items are selected */
-#wardrobe:has(#wardrobe-go:not([hidden])) .credits { margin-bottom: 72px; }
+
 
 .title-row { display: flex; align-items: center; gap: 10px; }
 .icon-btn.small { width: 32px; height: 32px; }
 .icon-btn.small svg { width: 18px; height: 18px; }
+
+.about-title { font-size: 22px; margin: 4px 0 2px; }
+.about-credit { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+#about .note { margin: 0 0 14px; }
+
+.about-status { min-height: 20px; margin: -6px 0 6px; text-align: center; font-size: 13px; color: var(--muted); }
