@@ -208,7 +208,9 @@ h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
   overflow: hidden;
   margin-bottom: 12px;
 }
-.preview img { max-width: 88%; max-height: 88%; object-fit: contain; transition: transform 0.15s; }
+/* The picture gets a box of a fixed size (percent max-height inside a content-sized grid row was
+   ignored, so tall items were cut off at the bottom) and is centred inside it. */
+.preview img { position: absolute; inset: 6%; width: 88%; height: 88%; object-fit: contain; object-position: center; transition: transform 0.15s; }
 .checker {
   background-color: var(--card);
   background-image: conic-gradient(var(--checker) 25%, transparent 0 50%, var(--checker) 0 75%, transparent 0);

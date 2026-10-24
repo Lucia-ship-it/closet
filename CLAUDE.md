@@ -30,8 +30,8 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 41), e.g.
-  `sed -i '' 's/?v=41/?v=42/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 42), e.g.
+  `sed -i '' 's/?v=42/?v=43/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
   keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
