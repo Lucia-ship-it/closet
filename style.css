@@ -396,3 +396,6 @@ body { max-width: 520px; margin: 0 auto; }
 .app-foot { text-align: center; font-size: 13px; color: var(--muted); margin: 0 0 90px; }
 .app-foot .text-btn { padding: 0; font-size: 13px; }
 .notice.update { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+.note { margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--card); color: var(--muted); font-size: 13px; line-height: 1.45; }
+.note strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 2px; }

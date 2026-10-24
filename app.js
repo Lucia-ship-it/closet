@@ -1,7 +1,7 @@
-import * as db from './db.js?v=37';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=37';
-import { editImage } from './editor.js?v=37';
-import { enhance } from './enhance.js?v=37';
+import * as db from './db.js?v=38';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=38';
+import { editImage } from './editor.js?v=38';
+import { enhance } from './enhance.js?v=38';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -918,6 +918,7 @@ $('#wardrobe-go').onclick = () => {
 
 function renderAdd() {
   $('#add-start').hidden = !!add.original;
+  $('#storage-note').hidden = !!add.original;
   $('#add-review').hidden = !add.original;
 
   const pick = $('#cat-pick');
