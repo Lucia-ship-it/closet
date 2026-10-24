@@ -1,7 +1,7 @@
-import * as db from './db.js?v=38';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=38';
-import { editImage } from './editor.js?v=38';
-import { enhance } from './enhance.js?v=38';
+import * as db from './db.js?v=39';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=39';
+import { editImage } from './editor.js?v=39';
+import { enhance } from './enhance.js?v=39';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -1046,11 +1046,13 @@ $('#retry-cutout').onclick = async () => {
 
 $('#touch-up').onclick = async () => {
   if (!add.cutout) return toast('The cutout is not ready yet.');
-  const edited = await editImage(add.cutout, { original: add.original });
+  // The editor starts at the same Enhance value as this screen and hands the chosen value back;
+  // the enhancement itself is applied once, when the item is saved.
+  const edited = await editImage(add.cutout, { original: add.original, enhanceStart: add.enhance, previewOnly: true });
   if (!edited) return;
   add.cutout = edited.blob;
   add.source = 'cutout';
-  if (edited.enhanced) add.enhance = 0; // already applied, do not enhance twice
+  add.enhance = edited.enhanceAmount;
   renderAdd();
 };
 

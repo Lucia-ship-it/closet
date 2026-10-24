@@ -30,8 +30,8 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 38), e.g.
-  `sed -i '' 's/?v=38/?v=39/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 39), e.g.
+  `sed -i '' 's/?v=39/?v=40/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
   keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
@@ -90,7 +90,7 @@ The category is **never pre-selected** (the user found a leftover choice confusi
 guess would need an ML classifier, so it was not built).
 The cutout sometimes keeps a hanger or floor; the user wanted a manual fix, not auto-detection.
 
-**Touch-up editor** (`editor.js`, also reachable for saved items) – Erase / Restore / Move tools,
+**Touch-up editor** (`editor.js`, also reachable for saved items; opened from Add it starts at the same Enhance value and hands the value back without baking it in, so enhancement is applied once, on save; for saved items it starts at 0 and is baked in) – Erase / Restore / Move tools,
 brush size slider, Undo, zoom (pinch, wheel, + / − / Fit) and two-finger pan, Enhance slider.
 Strokes are kept as a list (cheap undo). While adding a new item *Restore* paints back from the **original photo** (so parts the AI cut away can be recovered); for already saved items only the cutout is available, so Restore just undoes erasing.
 A "remove loose bits" button was built and then **removed at the user's request** (did not work well).

@@ -1,12 +1,15 @@
 // Touch-up editor: erase leftovers (hanger, floor…), bring parts back and optionally enhance, with zoom and pan.
-// editImage(blob, { original }) resolves with { blob, enhanced } for the edited PNG, or null when nothing changed.
+// editImage(blob, { original, enhanceStart, previewOnly }) resolves with { blob, enhanced, enhanceAmount } for the edited PNG,
+// or null when nothing changed (always an object with previewOnly, unless cancelled).
 // With `original` (the photo before background removal), Restore can bring back parts the removal cut away.
-import { enhance } from './enhance.js?v=38';
+// `enhanceStart` is the strength (0..1) the Enhance slider starts at. With `previewOnly` the enhancement is only shown
+// while editing and is NOT baked into the result: the caller keeps the chosen `enhanceAmount` and applies it later.
+import { enhance } from './enhance.js?v=39';
 
 const $ = (s) => document.querySelector(s);
 const MAX_ZOOM = 10;
 
-export async function editImage(blob, { original } = {}) {
+export async function editImage(blob, { original, enhanceStart = 0, previewOnly = false } = {}) {
   const root = $('#editor');
   const view = $('#ed-view');
   const stage = $('#ed-stage');
@@ -66,14 +69,16 @@ export async function editImage(blob, { original } = {}) {
 
   // Puts the picture together: the cutout, plus the original photo where it was brought back,
   // minus what was erased.
-  function compose() {
+  function compose(raw = false) {
+    const shownBase = raw ? bmp : base;
+    const shownOrig = raw ? origBmp : origBase; // raw: without enhancement
     ctx.globalCompositeOperation = 'source-over';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(base, 0, 0);
-    if (origBase && strokes.some((st) => st.mode === 'restore')) {
+    ctx.drawImage(shownBase, 0, 0);
+    if (shownOrig && strokes.some((st) => st.mode === 'restore')) {
       xctx.globalCompositeOperation = 'source-over';
       xctx.clearRect(0, 0, scratch.width, scratch.height);
-      xctx.drawImage(origBase, 0, 0, scratch.width, scratch.height);
+      xctx.drawImage(shownOrig, 0, 0, scratch.width, scratch.height);
       xctx.globalCompositeOperation = 'destination-in';
       xctx.drawImage(showMask, 0, 0);
       ctx.drawImage(scratch, 0, 0);
@@ -280,8 +285,8 @@ export async function editImage(blob, { original } = {}) {
   // Enhance slider: only the latest requested strength is kept in memory.
   const enhanceInput = $('#ed-enhance');
   const enhanceOut = $('#ed-enhance-value');
-  enhanceInput.value = 0;
-  enhanceOut.textContent = '0';
+  enhanceInput.value = Math.round(enhanceStart * 100);
+  enhanceOut.textContent = String(Math.round(enhanceStart * 100));
 
   function swapBase(next, nextOrig) {
     const old = base;
@@ -329,6 +334,7 @@ export async function editImage(blob, { original } = {}) {
   });
 
   render();
+  if (enhanceStart) request(enhanceStart);
 
   /* ----- finish ----- */
 
@@ -348,8 +354,11 @@ export async function editImage(blob, { original } = {}) {
       const wanted = Number(enhanceInput.value) / 100;
       if (wanted !== amount) request(wanted);
       await inflight;
-      compose(); // render() is queued in a frame; compose once more synchronously to be safe
-      canvas.toBlob((b) => close(strokes.length || amount ? { blob: b, enhanced: amount > 0 } : null), 'image/png');
+      compose(previewOnly); // render() is queued in a frame; compose once more synchronously to be safe
+      canvas.toBlob((b) => {
+        if (previewOnly) close({ blob: strokes.length ? b : blob, enhanced: false, enhanceAmount: amount });
+        else close(strokes.length || amount ? { blob: b, enhanced: amount > 0, enhanceAmount: amount } : null);
+      }, 'image/png');
     });
   });
 }
