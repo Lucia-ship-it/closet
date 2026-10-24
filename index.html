@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Closet">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css?v=36">
+  <link rel="stylesheet" href="style.css?v=37">
   <title>Closet</title>
 </head>
 <body>
@@ -52,6 +52,7 @@
       <p id="edit-hint" class="hint" hidden>Tap an item to change its category, touch it up or delete it.</p>
       </div>
       <div id="grid" class="grid"></div>
+      <p class="app-foot"><span id="version"></span> · <button id="check-update" class="text-btn">Check for updates</button></p>
       <button id="wardrobe-go" class="primary floating" hidden>View outfit</button>
     </section>
 
@@ -184,10 +185,12 @@
     </div>
   </div>
 
+  <div id="update-bar" class="notice update" hidden>A new version is ready. <button id="update-now" class="text-btn">Update</button></div>
+
   <div id="notice" class="notice" role="alert" hidden></div>
 
   <div id="toast" class="toast" hidden></div>
 
-  <script type="module" src="app.js?v=36"></script>
+  <script type="module" src="app.js?v=37"></script>
 </body>
 </html>

@@ -30,9 +30,17 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 36), e.g.
-  `sed -i '' 's/?v=36/?v=37/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 37), e.g.
+  `sed -i '' 's/?v=37/?v=38/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
+- **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
+  keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
+  fetches `index.html` with `no-store`, compares its `app.js?v=NN` with the running version
+  (`import.meta.url`), and if newer it reloads via a never-seen URL (`./?u=NN`); when the app comes
+  back to the foreground it shows an "Update" bar instead. Closet has a footer with the version and a
+  *Check for updates* button. The version footer is the quickest way to see what is installed.
+  **Never tell the user to delete the Home Screen icon or clear website data** to update: the
+  wardrobe lives in that app's storage and would be lost (there is no backup yet).
 - `serve.py` is the local dev server (`python3 serve.py [port]`, serves its own folder, sends
   `Cache-Control: no-store`). Do not use `python3 -m http.server`.
 - **IndexedDB upgrades are blocked by other open tabs** of the app. `db.js` exposes `onBlocked`

@@ -143,7 +143,7 @@ h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
 .empty .plus { font-size: 30px; line-height: 1; color: var(--accent); }
 
 /* Šatník – mriežka */
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-bottom: 80px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-bottom: 16px; }
 .tile {
   position: relative;
   aspect-ratio: 3 / 4;
@@ -392,3 +392,7 @@ body { max-width: 520px; margin: 0 auto; }
 
 .size-btns { display: flex; gap: 6px; margin-left: auto; margin-right: 12px; }
 .size-btns .small-btn { min-width: 38px; padding: 6px 12px; font-size: 18px; line-height: 1; }
+
+.app-foot { text-align: center; font-size: 13px; color: var(--muted); margin: 0 0 90px; }
+.app-foot .text-btn { padding: 0; font-size: 13px; }
+.notice.update { display: flex; justify-content: space-between; align-items: center; gap: 12px; }

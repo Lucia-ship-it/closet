@@ -1,7 +1,7 @@
-import * as db from './db.js?v=36';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=36';
-import { editImage } from './editor.js?v=36';
-import { enhance } from './enhance.js?v=36';
+import * as db from './db.js?v=37';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=37';
+import { editImage } from './editor.js?v=37';
+import { enhance } from './enhance.js?v=37';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -1139,3 +1139,60 @@ try {
 }
 db.askPersist();
 showTab(state.items.length ? 'outfit' : 'add');
+
+/* ---------- Updates ---------- */
+
+// A home-screen web app on iPhone has no refresh gesture and keeps old files for a while.
+// So the app checks for itself whether a newer version is published (the version is the
+// ?v=NN number in index.html) and reloads from the network when there is one.
+const RUNNING_VERSION = Number(new URL(import.meta.url).searchParams.get('v')) || 0;
+
+async function latestVersion() {
+  try {
+    const res = await fetch(`index.html?check=${Date.now()}`, { cache: 'no-store' });
+    const match = (await res.text()).match(/app\.js\?v=(\d+)/);
+    return match ? Number(match[1]) : null;
+  } catch {
+    return null; // offline: nothing to check
+  }
+}
+
+function loadVersion(version) {
+  // a URL that was never visited cannot come from the cache
+  location.replace(`./?u=${version}`);
+}
+
+async function checkForUpdate({ manual = false } = {}) {
+  const latest = await latestVersion();
+  if (latest && latest > RUNNING_VERSION) {
+    if (manual) return showUpdate(latest);
+    // at launch: update straight away, unless this page was just loaded by an update
+    let tried = null;
+    try {
+      tried = sessionStorage.getItem('closet.updating');
+      sessionStorage.setItem('closet.updating', String(latest));
+    } catch {
+      // storage unavailable: show the button instead of reloading automatically
+      return showUpdate(latest);
+    }
+    if (tried === String(latest)) return showUpdate(latest);
+    return loadVersion(latest);
+  }
+  if (manual) toast(latest ? `You have the latest version (${RUNNING_VERSION})` : "Couldn't check for updates");
+}
+
+function showUpdate(version) {
+  const bar = $('#update-bar');
+  bar.hidden = false;
+  $('#update-now').onclick = () => loadVersion(version);
+}
+
+$('#version').textContent = `Version ${RUNNING_VERSION}`;
+$('#check-update').onclick = () => checkForUpdate({ manual: true });
+// coming back to the app after a while: look for a newer version, but let the user choose when to reload
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible') return;
+  const latest = await latestVersion();
+  if (latest && latest > RUNNING_VERSION) showUpdate(latest);
+});
+checkForUpdate();
