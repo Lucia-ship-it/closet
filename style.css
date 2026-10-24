@@ -401,9 +401,9 @@ body { max-width: 520px; margin: 0 auto; }
 
 .notice.update { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
-.note { margin: 14px 0 0; padding: 16px 20px; border-radius: 14px; background: var(--card); color: var(--muted); font-size: 13px; line-height: 1.5; text-align: center; }
-.note strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 4px; }
-.note svg { display: block; width: 22px; height: 22px; margin: 0 auto 8px; color: var(--accent); }
+.note { margin: 14px 0 0; padding: 12px 18px; border-radius: 12px; background: var(--card); color: var(--muted); font-size: 13px; line-height: 1.5; text-align: center; }
+.note strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 2px; }
+
 
 /* Space above the headers. iPhones without a notch (SE, 8) draw a blurred strip over the top of a
    Home Screen app, taller than the status bar; the header must start below it or it looks smeared. */
