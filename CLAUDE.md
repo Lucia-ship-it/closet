@@ -1,7 +1,7 @@
 # Closet – project notes for Claude
 
-Read this first. It explains what the app is, who it is for, how it is built, and every
-decision made so far, so work can continue without the original conversation.
+Read this first. It explains what the app is, who it is for, how it is built and published, and
+every decision made so far, so work can continue without the original conversation.
 
 ## Before any monetisation (the user asked for this reminder)
 
@@ -13,45 +13,67 @@ via esm.sh, which is **AGPL-3.0**, plus the model files it downloads), any fonts
 scripts added later, and the licences of everything the page fetches from other sites.
 Report each one with its licence and what it means for selling, and recommend legal advice
 (she is not a lawyer and neither am I). Also mention the practical side raised earlier: tax and
-VAT, terms and privacy policy, and the platform fees (Buy Me a Coffee takes about 5%).
+VAT, terms and privacy policy, an employment contract that may restrict side income, and platform
+fees (Buy Me a Coffee takes about 5%).
 
 ## What this is
 
 A personal **wardrobe / outfit-planning web app**, built by "vibe coding" with a non-developer
 (the user). The user photographs their clothes with an iPhone, the app removes the background,
 sorts the items into categories and lets them put outfits together on one screen.
+The user's idea: she saw a paid ad for a wardrobe app and decided to build one with exactly the
+features she needs herself.
 
 - Runs in the browser (Safari on iPhone, added to the Home Screen; also used on a Mac while
   developing). **No installation, no App Store, no Xcode.** (Xcode was rejected: the Mac has
   little free disk space.)
-- Planned hosting: **GitHub Pages** (free, static). Nothing is sent to any server; all photos
-  and outfits stay on the user's device.
+- Nothing is sent to any server; all photos and outfits stay on the user's device.
 - The user writes to me in **Slovak**. The **app UI is in English** (their explicit request).
   Answer in Slovak, plain language, no jargon; they are not a programmer. Explain what a change
   does for them, and say honestly what was *not* verified (e.g. "tested in a desktop browser,
-  not on a real iPhone").
+  not on a real iPhone"). She likes to *try* something and then decide whether to keep it.
+- Her devices: a Mac with VS Code, and an **iPhone SE (3rd generation, no notch)**.
+
+## Where it lives and how changes get published
+
+- Code folder on the Mac: `/Users/lucia.kobzova/Documents/closet` (a git repository, branch `main`).
+- GitHub: `https://github.com/Lucia-ship-it/closet` (**public**). Live app (GitHub Pages, deployed
+  from `main` / root): **`https://lucia-ship-it.github.io/closet/`**. The address must never change
+  (renaming the repo or account would change it, and the data in browsers belongs to the address).
+- **I cannot push** (GitHub asks for a login I must not enter). Workflow: I make the change, test it,
+  bump the `?v=NN` number, **commit locally**, and tell the user to push from VS Code
+  (*Source Control → Sync Changes*). Pages updates a minute or two after the push; the installed
+  Home Screen app then updates itself (see "Updating the installed app").
+- Commit messages end with the line `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`
+  (use the model name given in the session's own instructions).
 
 ## Tech and rules of the house
 
 - Plain HTML + CSS + JavaScript ES modules. **No framework, no build step, no npm.**
   Keep it that way unless the user agrees; they edit it in VS Code.
-- Storage: **IndexedDB** (`db.js`, database `satnik`, version 2, stores `items` and `outfits`),
-  plus `localStorage` key `satnik.adjust` for hand adjustments of pieces.
+- Storage: **IndexedDB** (`db.js`, database named `satnik`, version 2, stores `items` and
+  `outfits`), plus `localStorage` key `satnik.adjust` (hand adjustments of pieces) and the
+  `sessionStorage` key `closet.updating`. **The old name `satnik` is kept on purpose: renaming the
+  database or keys would hide the user's existing wardrobe.** Browser storage is per address and per
+  device; a Home Screen app may keep its own storage separate from Safari.
 - Background removal: `@imgly/background-removal@1.4.5` loaded from **esm.sh**
   (`image.js`). The model is `'small'` (the first use downloads it, about a minute; later runs
-  are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
-  model names in this version are only `small` / `medium`.
+  are fast); *Try higher quality* uses `'medium'`. Notes: the jsDelivr `+esm` build of this library
+  is broken (lodash import error); model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
   `?v=NN`. **Bump NN in all of them whenever files change** (currently 53), e.g.
   `sed -i '' 's/?v=53/?v=54/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
-- **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
-  keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
-  fetches `index.html` with `no-store`, compares its `app.js?v=NN` with the running version
+- **Updating the installed Home Screen app.** iPhone Home Screen web apps have no pull-to-refresh
+  and keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch
+  it fetches `index.html` with `no-store`, compares its `app.js?v=NN` with the running version
   (`import.meta.url`), and if newer it reloads via a never-seen URL (`./?u=NN`); when the app comes
-  back to the foreground it shows an "Update" bar instead. *Check for updates* is a small text button at the **bottom of the Add screen**, above the credits line (an About slide-in sheet was tried and the user disliked it; Add is short, so no scrolling). **Decided by the user: it stays there.** The answer is shown on the button itself for 3 seconds (a toast would cover the footer).
-  version number is **deliberately not shown to users** (user request); it is available as
-  `document.documentElement.dataset.version` and in the script URL.
+  back to the foreground it shows an "Update" bar instead. *Check for updates* is a small text
+  button at the **bottom of the Add screen**, above the credits line (**decided by the user: it
+  stays there**; an About slide-in sheet was tried and she disliked it). Its answer is shown on the
+  button itself for 3 seconds (a toast would cover the footer). The version number is
+  **deliberately not shown to users**; it is `document.documentElement.dataset.version` and is in
+  the script URL.
   **Never tell the user to delete the Home Screen icon or clear website data** to update: the
   wardrobe lives in that app's storage and would be lost (there is no backup yet).
 - `serve.py` is the local dev server (`python3 serve.py [port]`, serves its own folder, sends
@@ -60,26 +82,50 @@ sorts the items into categories and lets them put outfits together on one screen
   and `app.js` shows a visible notice ("another tab is open … your items are safe"). New
   database versions must only *add* stores, never delete data. The user once thought their
   items had vanished because of exactly this; they had not.
-- The viewport meta has **no `viewport-fit=cover`** on purpose: on the user's iPhone (home-screen app) the header and the pink button looked smeared because content sat under the system status-bar blur. Without `cover` the page starts below it. This was an educated fix and still needs the user's confirmation on the device.
-- The smeared header **persisted on the user's iPhone SE (3rd gen, no notch) after `viewport-fit=cover` was removed**, so a second, targeted workaround is in `style.css`: `--top-clear` (12px normally, 46px for a Home Screen app on a short screen, `display-mode: standalone` and `max-height: 700px`) is the space above every header. It was a guess from screenshots, **confirmed working by the user on their iPhone SE 3** (the header is no longer smeared). Keep it unless a new device shows a problem.
+- **iPhone header blur (fixed, confirmed by the user on her SE 3):** the viewport meta has **no
+  `viewport-fit=cover`** on purpose, and `style.css` has `--top-clear` (12px normally, 46px for a
+  Home Screen app on a short screen: `display-mode: standalone` and `max-height: 700px`), the space
+  above every header, so headers start below the blurred strip at the top. Keep both unless a new
+  device shows a problem.
 - The layout is a phone-width column (max 520px, centred) also on wide screens (user request).
-- **Third-party licence to keep in mind:** background removal uses `@imgly/background-removal`, which is licensed **AGPL-3.0** (its README: "free for use under the AGPL License"; other licensing on request from IMG.LY, support@img.ly). It is loaded unmodified from esm.sh at runtime. How AGPL interacts with this app's own *All rights reserved* licence, and with any plan to charge money, was **not** settled (it is a legal question; the user was told to get advice or a commercial licence, or to switch library). Credit the library visibly if a credits line is added.
-- **Credits line** at the bottom of the Add screen, plain text: "© 2026 luci.k · Cutouts by IMG.LY (AGPL-3.0)" (no link, no "All rights reserved" on screen; the library credit stays because of its licence). The display name `luci.k` is a trial the user wants to look at before deciding to keep it; `LICENSE` in the repository still says *All rights reserved* and names `Lucia-ship-it` (make the name match if she keeps `luci.k`).
-- **Licence:** `LICENSE` says *All rights reserved* (user decision: the code may be read but not copied or reused). The repository stays **public** for now (GitHub Pages is free only for public repositories); making it private was discussed and postponed. Selling the app (e.g. a small fee) was discussed only theoretically; the notes on it: a static page cannot enforce payment, so charging needs a backend with sign-in, which fits the later cloud-sync idea (storage costs money, so paying for sync is the natural model).
-- Never ask the user to clear Safari website data: that deletes their wardrobe.
+
+## Licence, credits and sharing
+
+- `LICENSE` says *All rights reserved*, holder `Lucia-ship-it` (user decision: the code may be read
+  but not copied or reused). The repository stays **public** for now (GitHub Pages is free only for
+  public repositories); making it private was discussed and postponed (other hosts can serve a
+  private repo; the address would change and so would the stored data).
+- **Credits line** at the bottom of the Add screen, plain text: "© 2026 luci.k · Cutouts by IMG.LY
+  (AGPL-3.0)" (no link, no "All rights reserved" on screen; the library credit stays because of its
+  licence). The display name `luci.k` is a **trial** the user wants to look at before deciding to
+  keep it; if she keeps it, make `LICENSE` match.
+- **Third-party licence:** the background-removal library is **AGPL-3.0** (its README: "free for
+  use under the AGPL License"; other licensing on request from IMG.LY, support@img.ly), loaded
+  unmodified from esm.sh at runtime. How AGPL interacts with this app's own *All rights reserved*
+  licence, and with any plan to charge money, was **not settled** (legal question; the user was told
+  to get advice or a commercial licence, or to switch library).
+- **Money:** the user asked theoretically about charging (e.g. 1 EUR). Notes given: a static page
+  cannot enforce payment, so charging needs a backend with sign-in, which fits the later cloud-sync
+  idea (storage costs money, so paying for sync is the natural model). A "buy me a coffee" link was
+  considered and **postponed** (platform fee about 5%); if added later, use a platform page, not a
+  bank account or IBAN QR code.
+- **LinkedIn:** she plans to post about the app (draft text was written in the conversation: the
+  story of the ad, features, built with Claude Code, tested on her own iPhone). She worries about
+  being copied; advice given: show results, not internals; do not name the other app.
 
 ## Files
 
 | File | Role |
 | --- | --- |
-| `index.html` | All screens: Outfit, Closet, Saved, Add, plus the touch-up editor, the item sheet, a notice and a toast |
+| `index.html` | All screens: Outfit, Closet, Saved, Add, plus the touch-up editor, the item sheet, an update bar, a notice and a toast |
 | `style.css` | Look (colour tokens at the top, light and dark mode) |
-| `app.js` | Everything about screens and outfits (state, strips, Complete view, saved outfits, closet, add flow) |
+| `app.js` | Everything about screens and outfits (state, strips, Complete view, saved outfits, closet, add flow, update check) |
 | `editor.js` | Touch-up editor (erase / restore brush, zoom and pan, Enhance slider) |
 | `image.js` | Photo handling: downscale, background removal, crop, `tightCrop` (+ shoulder/body measurements) |
 | `enhance.js` | Cheap photo clean-up without AI (even out light, contrast, saturation) |
 | `db.js` | IndexedDB wrapper |
-| `serve.py`, `manifest.webmanifest`, `icon.png`, `README.md` | Dev server, Home Screen icon, short Slovak user guide |
+| `serve.py`, `manifest.webmanifest`, `icon.png` | Dev server, Home Screen icon |
+| `README.md`, `LICENSE`, `CLAUDE.md` | Short Slovak user guide, licence, these notes |
 
 ## Data model
 
@@ -96,27 +142,35 @@ sorts the items into categories and lets them put outfits together on one screen
 
 ## Screens and behaviour (and why)
 
-The Add screen (before a photo is chosen) also shows a note that the closet lives on this device only and is lost if the app or its website data is deleted (user request; the sentence about a missing backup was removed on purpose, although there is still no backup).
-
 **Add** – pick or take a photo → background removed automatically → choose category.
-Options: *Cutout / Original* toggle, *Straighten* slider + 90° button, **Enhance** slider
-(0–100, **starts at 35 for every new photo**, applied on save, not undoable), **Erase leftovers**
-opens the editor, and **Try higher quality** reruns the removal with the larger `medium` model
-(slower, larger one-time download; for difficult photos, e.g. a flowery skirt on a wooden floor).
-The category is **never pre-selected** (the user found a leftover choice confusing; an automatic
-guess would need an ML classifier, so it was not built).
-The cutout sometimes keeps a hanger or floor; the user wanted a manual fix, not auto-detection.
+Before a photo is chosen the screen shows a centred note that the closet lives on this device only
+and is lost if the app or its website data is deleted (user request; the sentence about a missing
+backup was removed on purpose, although there is still no backup; a phone icon in the note was
+tried and removed). The bottom of the screen holds *Check for updates* and the credits line.
+Options after choosing a photo: *Cutout / Original* toggle, *Straighten* slider + 90° button,
+**Enhance** slider (0–100, **starts at 35 for every new photo**, applied on save, not undoable),
+**Erase leftovers** opens the editor, and **Try higher quality** reruns the removal with the larger
+`medium` model (slower, larger one-time download; for difficult photos, e.g. a flowery skirt on a
+wooden floor). The category is **never pre-selected** (the user found a leftover choice confusing;
+an automatic guess would need an ML classifier, so it was not built). The preview box shows the item
+whole and centred (tall items were once cut off). The cutout sometimes keeps a hanger or floor; the
+user wanted a manual fix, not auto-detection.
 
-**Touch-up editor** (`editor.js`, also reachable for saved items; opened from Add it starts at the same Enhance value and hands the value back without baking it in, so enhancement is applied once, on save; for saved items it starts at 0 and is baked in) – Erase / Restore / Move tools,
+**Touch-up editor** (`editor.js`, also reachable for saved items) – Erase / Restore / Move tools,
 brush size slider, Undo, zoom (pinch, wheel, + / − / Fit) and two-finger pan, Enhance slider.
-Strokes are kept as a list (cheap undo). While adding a new item *Restore* paints back from the **original photo** (so parts the AI cut away can be recovered); for already saved items only the cutout is available, so Restore just undoes erasing.
-A "remove loose bits" button was built and then **removed at the user's request** (did not work well).
+Strokes are kept as a list (cheap undo). Opened from Add, it starts at the same Enhance value and
+hands the value back without baking it in, so enhancement is applied once, on save; for saved
+items it starts at 0 and is baked in. While adding a new item *Restore* paints back from the
+**original photo** (so parts the AI cut away can be recovered); for already saved items only the
+cutout is available, so Restore just undoes erasing. A "remove loose bits" button was built and
+then **removed at the user's request** (did not work well).
 
 **Outfit (strips view)** – rows of horizontally swipeable strips (scroll-snap): top and bottom
 separately; a layer (sweater/jacket) sits next to the top or dress as a half-width strip.
 Controls: *Top + bottom | Dress*, then *+ Sweater | + Jacket | + Shoes* (sweater and jacket
 are mutually exclusive; tapping the active one turns it off). The shuffle button was removed
-at the user's request.
+at the user's request. The header has *Complete*; in Complete view it becomes *Edit* and a heart
+(save) appears.
 
 **Complete view** (`buildOutfit` / `renderComplete`) – the outfit shown as if worn.
 Decisions, in order they were made:
@@ -131,13 +185,19 @@ Decisions, in order they were made:
 5. Bottoms sit directly under the upper part (8 units overlap), shoes (optional) at the very bottom.
 6. Units: figure 200 wide; fit boxes top 150x190, dress 170x420, bottom 120x300, shoes 110x70.
 
-**Hand adjustment** (`setUpAdjust`) – tap a piece in the picture to select it (hit test uses the
-picture's transparency, topmost wins); drag to move, pinch / wheel to resize (about the shoulder
-line; shoes and bottoms about their top centre). Made forgiving for fingers (small pieces such as shoes were hard to grab): a touch that lands within about 20px of a piece's visible pixels selects it; once a piece is selected it can be dragged or pinched from anywhere, and the selection is only cleared by a plain *tap* on empty space (not by a drag or pinch); the selected piece also has **− / +** buttons under the picture for resizing without pinching. Nothing is selected at first; **tapping outside
-deselects** (user request) and nothing can be moved without a selection. A dashed frame shows the
-selection; buttons under the picture (Bottom / Top / Sweater / Jacket / Dress / Shoes) are the
-alternative way to select. **Pieces cannot leave the grey outfit card** (`keepInside`).
-Adjustments are remembered per item (per pair for layers) and reset with *Reset*.
+**Hand adjustment** (`setUpAdjust`) – every piece (top, layer, dress, bottom, shoes) can be moved
+and resized. Tap a piece in the picture to select it (hit test uses the picture's transparency,
+topmost wins); drag to move, pinch / wheel to resize (about the shoulder line; shoes and bottoms
+about their top centre). Made forgiving for fingers (small pieces such as shoes were hard to
+grab): a touch within about 20px of a piece's visible pixels selects it; once a piece is selected it
+can be dragged or pinched from anywhere, and the selection is only cleared by a plain *tap* on
+empty space (not by a drag or pinch); the selected piece also has **− / +** buttons under the
+picture for resizing without pinching. Nothing is selected at first; **tapping outside deselects**
+(user request) and nothing can be moved without a selection. A dashed frame shows the selection;
+buttons under the picture (Bottom / Top / Sweater / Jacket / Dress / Shoes) are the alternative
+way to select (tapping the selected one again deselects it). **Pieces cannot leave the grey outfit
+card** (`keepInside`). Adjustments are remembered per item (per pair for layers) and reset with
+*Reset*.
 
 **Saved** – heart button in Complete view saves the whole outfit (mode, items, adjustments);
 the heart is filled while the shown outfit is already saved; tapping it again removes it.
@@ -159,20 +219,24 @@ a sheet: change category, touch up the photo, delete.
 - Enhance must stay light (canvas maths, no AI, little memory). It evens out shadows and colour;
   it does **not** iron out wrinkles.
 - Everything must work with a finger on a phone (pointer events, `touch-action: none` where needed).
+- The user dislikes clutter: small, quiet controls; things she does not need are removed rather than
+  hidden (shuffle, version number, loose-bits button, About sheet, phone icon).
 
 ## How to test
 
-Run `python3 serve.py 8765`, open it in a browser (or the preview pane) at phone size.
-Real photos are not available in tests, so make synthetic items (canvases saved with
+Run `python3 serve.py 8766 &` from this folder and open it in a browser (or the preview pane) at
+phone size (the preview tool's launch config may point at an old folder, so start the server
+yourself). Real photos are not available in tests, so make synthetic items (canvases saved with
 `db.put`) – remember to delete them afterwards. Pointer events can be dispatched by script with
-`pointerId: 1` (other ids make `setPointerCapture` throw). Real iPhone behaviour (camera,
-multi-touch, Home Screen install) has **not** been verified by me; say so.
+`pointerId: 1` for the first pointer (other ids make `setPointerCapture` throw in a real browser;
+the app now tolerates that). Real iPhone behaviour (camera, multi-touch, Home Screen install) has
+**not** been verified by me unless the user confirmed it; say so.
 
 ## Ideas not done yet
 
 - **Backup / sync across devices, and later user accounts.** Decision (user): **postponed**.
   Today every device has its own separate wardrobe (data lives in the browser, tied to the page
-  address; moving from `localhost` to `github.io` starts empty, and the address must never change).
+  address; the app on `github.io` started empty, separate from what was tested on `localhost`).
   The user's longer-term idea: a few users who log in and find their items on several devices.
   That needs a **backend** (sign-in plus storage for photos and outfits, e.g. Firebase or
   Supabase), which GitHub Pages cannot provide. Keep the data model (`items`, `outfits`,
@@ -181,4 +245,5 @@ multi-touch, Home Screen install) has **not** been verified by me; say so.
 - Shoes could follow the bottoms automatically when those are resized.
 - Two layers at once (sweater and jacket), which needs a different half-and-half display.
 - Skirt filter/tag inside Bottoms.
-- Publishing to GitHub Pages (README has the steps in Slovak).
+- A 30-second demo video for LinkedIn: the user has iPhone screen recordings; ffmpeg is not
+  installed (Homebrew is); trimming needs her permission to install it, or she can use QuickTime.
