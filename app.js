@@ -1,7 +1,7 @@
-import * as db from './db.js?v=39';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=39';
-import { editImage } from './editor.js?v=39';
-import { enhance } from './enhance.js?v=39';
+import * as db from './db.js?v=40';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=40';
+import { editImage } from './editor.js?v=40';
+import { enhance } from './enhance.js?v=40';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -1181,7 +1181,7 @@ async function checkForUpdate({ manual = false } = {}) {
     if (tried === String(latest)) return showUpdate(latest);
     return loadVersion(latest);
   }
-  if (manual) toast(latest ? `You have the latest version (${RUNNING_VERSION})` : "Couldn't check for updates");
+  if (manual) toast(latest ? 'You have the latest version' : "Couldn't check for updates");
 }
 
 function showUpdate(version) {
@@ -1190,7 +1190,7 @@ function showUpdate(version) {
   $('#update-now').onclick = () => loadVersion(version);
 }
 
-$('#version').textContent = `Version ${RUNNING_VERSION}`;
+document.documentElement.dataset.version = String(RUNNING_VERSION); // not shown to users; handy when debugging
 $('#check-update').onclick = () => checkForUpdate({ manual: true });
 // coming back to the app after a while: look for a newer version, but let the user choose when to reload
 document.addEventListener('visibilitychange', async () => {
