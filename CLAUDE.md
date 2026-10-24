@@ -30,8 +30,8 @@ sorts the items into categories and lets them put outfits together on one screen
   are fast). Notes: the jsDelivr `+esm` build of this library is broken (lodash import error);
   model names in this version are only `small` / `medium`.
 - **Cache busting:** every local import and the `<script>`/`<link>` in `index.html` carry
-  `?v=NN`. **Bump NN in all of them whenever files change** (currently 40), e.g.
-  `sed -i '' 's/?v=40/?v=41/g' index.html app.js editor.js`. Browsers (Safari especially) cache
+  `?v=NN`. **Bump NN in all of them whenever files change** (currently 41), e.g.
+  `sed -i '' 's/?v=41/?v=42/g' index.html app.js editor.js`. Browsers (Safari especially) cache
   modules and once served a stale `image.js` against a new `app.js`.
 - **Updating the installed home-screen app.** iPhone home-screen web apps have no pull-to-refresh and
   keep old files (GitHub Pages sends `max-age=600`). The app therefore checks itself: at launch it
@@ -49,6 +49,7 @@ sorts the items into categories and lets them put outfits together on one screen
   database versions must only *add* stores, never delete data. The user once thought their
   items had vanished because of exactly this; they had not.
 - The viewport meta has **no `viewport-fit=cover`** on purpose: on the user's iPhone (home-screen app) the header and the pink button looked smeared because content sat under the system status-bar blur. Without `cover` the page starts below it. This was an educated fix and still needs the user's confirmation on the device.
+- The smeared header **persisted on the user's iPhone SE (3rd gen, no notch) after `viewport-fit=cover` was removed**, so a second, targeted workaround is in `style.css`: `--top-clear` (12px normally, 46px for a Home Screen app on a short screen, `display-mode: standalone` and `max-height: 700px`) is the space above every header. It is a guess from screenshots and may need tuning; ask the user to confirm on the device.
 - The layout is a phone-width column (max 520px, centred) also on wide screens (user request).
 - Never ask the user to clear Safari website data: that deletes their wardrobe.
 

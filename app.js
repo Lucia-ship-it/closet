@@ -1,7 +1,7 @@
-import * as db from './db.js?v=40';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=40';
-import { editImage } from './editor.js?v=40';
-import { enhance } from './enhance.js?v=40';
+import * as db from './db.js?v=41';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=41';
+import { editImage } from './editor.js?v=41';
+import { enhance } from './enhance.js?v=41';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
