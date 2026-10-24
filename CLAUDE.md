@@ -49,7 +49,7 @@ sorts the items into categories and lets them put outfits together on one screen
   database versions must only *add* stores, never delete data. The user once thought their
   items had vanished because of exactly this; they had not.
 - The viewport meta has **no `viewport-fit=cover`** on purpose: on the user's iPhone (home-screen app) the header and the pink button looked smeared because content sat under the system status-bar blur. Without `cover` the page starts below it. This was an educated fix and still needs the user's confirmation on the device.
-- The smeared header **persisted on the user's iPhone SE (3rd gen, no notch) after `viewport-fit=cover` was removed**, so a second, targeted workaround is in `style.css`: `--top-clear` (12px normally, 46px for a Home Screen app on a short screen, `display-mode: standalone` and `max-height: 700px`) is the space above every header. It is a guess from screenshots and may need tuning; ask the user to confirm on the device.
+- The smeared header **persisted on the user's iPhone SE (3rd gen, no notch) after `viewport-fit=cover` was removed**, so a second, targeted workaround is in `style.css`: `--top-clear` (12px normally, 46px for a Home Screen app on a short screen, `display-mode: standalone` and `max-height: 700px`) is the space above every header. It was a guess from screenshots, **confirmed working by the user on their iPhone SE 3** (the header is no longer smeared). Keep it unless a new device shows a problem.
 - The layout is a phone-width column (max 520px, centred) also on wide screens (user request).
 - Never ask the user to clear Safari website data: that deletes their wardrobe.
 
