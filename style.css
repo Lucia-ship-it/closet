@@ -398,7 +398,7 @@ body { max-width: 520px; margin: 0 auto; }
 .size-btns { display: flex; gap: 6px; margin-left: auto; margin-right: 12px; }
 .size-btns .small-btn { min-width: 38px; padding: 6px 12px; font-size: 18px; line-height: 1; }
 
-.app-foot { text-align: center; font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.app-foot { text-align: center; font-size: 13px; color: var(--muted); margin: auto 0 8px; } /* auto: pushed to the bottom of the screen when the list is short */
 .app-foot .text-btn { padding: 0; font-size: 13px; }
 .notice.update { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
@@ -412,5 +412,7 @@ body { max-width: 520px; margin: 0 auto; }
   :root { --top-clear: 46px; }
 }
 
-.credits { text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); margin: 0 0 90px; white-space: nowrap; }
+.credits { text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); margin: 0 0 12px; white-space: nowrap; }
+/* room for the floating View outfit button while items are selected */
+#wardrobe:has(#wardrobe-go:not([hidden])) .credits { margin-bottom: 72px; }
 .credits a { color: inherit; text-decoration: underline; }
