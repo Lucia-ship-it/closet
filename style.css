@@ -413,12 +413,10 @@ body { max-width: 520px; margin: 0 auto; }
 
 
 
-.title-row { display: flex; align-items: center; gap: 10px; }
-.icon-btn.small { width: 32px; height: 32px; }
-.icon-btn.small svg { width: 18px; height: 18px; }
 
-.about-title { font-size: 22px; margin: 4px 0 2px; }
-.about-credit { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
-#about .note { margin: 0 0 14px; }
 
-.about-status { min-height: 20px; margin: -6px 0 6px; text-align: center; font-size: 13px; color: var(--muted); }
+
+/* Bottom of the Add screen: update check and credits */
+.add-foot { margin-top: auto; padding-top: 20px; text-align: center; }
+.add-foot .text-btn { font-size: 13px; padding: 4px 8px; }
+.credits { margin: 2px 0 6px; font-size: 12px; line-height: 1.5; color: var(--muted); white-space: nowrap; }

@@ -1,7 +1,7 @@
-import * as db from './db.js?v=49';
-import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=49';
-import { editImage } from './editor.js?v=49';
-import { enhance } from './enhance.js?v=49';
+import * as db from './db.js?v=51';
+import { loadScaled, removeBg, finalize, tightCrop } from './image.js?v=51';
+import { editImage } from './editor.js?v=51';
+import { enhance } from './enhance.js?v=51';
 
 const CATS = { top: 'Top', bottom: 'Bottom', dress: 'Dress', sweater: 'Sweater', jacket: 'Jacket', shoes: 'Shoes' };
 const PLURAL = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', sweater: 'Sweaters', jacket: 'Jackets', shoes: 'Shoes' };
@@ -1165,10 +1165,13 @@ function loadVersion(version) {
   location.replace(`./?u=${version}`);
 }
 
-// Inside the About sheet the answer is written under the button (a toast would cover it).
-function say(text) {
-  if ($('#about').hidden) return toast(text);
-  $('#about-status').textContent = text;
+// The answer replaces the button label for a moment (a toast would cover the footer).
+let answerTimer;
+function answerOnButton(text) {
+  const button = $('#check-update');
+  button.textContent = text;
+  clearTimeout(answerTimer);
+  answerTimer = setTimeout(() => (button.textContent = 'Check for updates'), 3000);
 }
 
 async function checkForUpdate({ manual = false } = {}) {
@@ -1187,7 +1190,7 @@ async function checkForUpdate({ manual = false } = {}) {
     if (tried === String(latest)) return showUpdate(latest);
     return loadVersion(latest);
   }
-  if (manual) say(latest ? 'You have the latest version' : "Couldn't check for updates");
+  if (manual) answerOnButton(latest ? 'You have the latest version' : "Couldn't check for updates");
 }
 
 function showUpdate(version) {
@@ -1199,14 +1202,7 @@ function showUpdate(version) {
 document.documentElement.dataset.version = String(RUNNING_VERSION); // not shown to users; handy when debugging
 $('#check-update').onclick = () => checkForUpdate({ manual: true });
 
-// About: credits, the storage note and the update check, kept out of the main screens
-const openAbout = (open) => {
-  $('#about').hidden = !open;
-  $('#about-status').textContent = '';
-};
-$('#about-open').onclick = () => openAbout(true);
-$('#about-close').onclick = () => openAbout(false);
-document.querySelector('#about .sheet-backdrop').onclick = () => openAbout(false);
+
 // coming back to the app after a while: look for a newer version, but let the user choose when to reload
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible') return;
