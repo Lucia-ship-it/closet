@@ -4,7 +4,7 @@
 // With `original` (the photo before background removal), Restore can bring back parts the removal cut away.
 // `enhanceStart` is the strength (0..1) the Enhance slider starts at. With `previewOnly` the enhancement is only shown
 // while editing and is NOT baked into the result: the caller keeps the chosen `enhanceAmount` and applies it later.
-import { enhance } from './enhance.js?v=45';
+import { enhance } from './enhance.js?v=46';
 
 const $ = (s) => document.querySelector(s);
 const MAX_ZOOM = 10;

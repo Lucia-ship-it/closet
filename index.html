@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Closet">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css?v=45">
+  <link rel="stylesheet" href="style.css?v=46">
   <title>Closet</title>
 </head>
 <body>
@@ -19,7 +19,12 @@
     <!-- Obrazovka 1: skladanie outfitu -->
     <section id="outfit" class="screen">
       <header>
-        <h1>Outfit</h1>
+        <div class="title-row">
+          <h1>Outfit</h1>
+          <button id="check-update" class="icon-btn small" aria-label="Check for updates" title="Check for updates">
+            <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-3M4 5v3h3M4 13a8 8 0 0 0 14.9 3M20 19v-3h-3"/></svg>
+          </button>
+        </div>
         <div class="head-actions">
           <button id="complete" class="pill-btn">Complete</button>
           <button id="save-outfit" class="icon-btn" aria-label="Save outfit" hidden>
@@ -52,8 +57,7 @@
       <p id="edit-hint" class="hint" hidden>Tap an item to change its category, touch it up or delete it.</p>
       </div>
       <div id="grid" class="grid"></div>
-      <p class="app-foot"><button id="check-update" class="text-btn">Check for updates</button></p>
-      <p class="credits">© 2026 luci.k · Cutouts by <a href="https://github.com/imgly/background-removal-js" target="_blank" rel="noopener">IMG.LY</a> (AGPL-3.0)</p>
+      <p class="credits">© 2026 luci.k · Cutouts by IMG.LY (AGPL-3.0)</p>
       <button id="wardrobe-go" class="primary floating" hidden>View outfit</button>
     </section>
 
@@ -198,6 +202,6 @@
 
   <div id="toast" class="toast" hidden></div>
 
-  <script type="module" src="app.js?v=45"></script>
+  <script type="module" src="app.js?v=46"></script>
 </body>
 </html>
