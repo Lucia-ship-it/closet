@@ -38,8 +38,16 @@ features she needs herself.
 
 - Code folder on the Mac: `/Users/lucia.kobzova/Documents/closet` (a git repository, branch `main`).
 - GitHub: `https://github.com/Lucia-ship-it/closet` (**public**). Live app (GitHub Pages, deployed
-  from `main` / root): **`https://lucia-ship-it.github.io/closet/`**. The address must never change
-  (renaming the repo or account would change it, and the data in browsers belongs to the address).
+  from `main` / root): **`https://lucia-ship-it.github.io/closet/`**.
+- **What an address change does to the data:** browser storage belongs to the *origin*, i.e. the
+  `https://lucia-ship-it.github.io` part, **not** the path `/closet/`. So renaming the *repository*
+  keeps the same origin (the stored wardrobe stays), but the old Pages URL then gives 404 (no
+  redirect) and the Home Screen icon must be added again; whether a re-added Home Screen app
+  sees the old storage was **not verified**. Renaming the GitHub *account*, using a custom domain
+  or moving to another host (Netlify, Cloudflare Pages…) changes the origin: the wardrobe starts
+  empty. Do such changes early, while there is little data, and ideally after an export/backup exists.
+  All links in the code are relative, so a rename breaks nothing in the code itself; update the
+  URLs in these notes and in `README.md`.
 - **I cannot push** (GitHub asks for a login I must not enter). Workflow: I make the change, test it,
   bump the `?v=NN` number, **commit locally**, and tell the user to push from VS Code
   (*Source Control → Sync Changes*). Pages updates a minute or two after the push; the installed

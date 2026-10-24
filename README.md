@@ -52,6 +52,6 @@ Potom otvor v prehliadači `http://localhost:8000`.
 ## Dobré vedieť
 
 - Kúsky a outfity sú uložené **iba v tomto zariadení**. Na GitHube je len kód. Ikonu z plochy ani dáta stránok v Safari **nemaž**, prišla by si o šatník. Záloha zatiaľ nie je.
-- Dáta patria k adrese aplikácie. Zmena názvu repozitára alebo účtu by zmenila adresu a v telefóne by sa stratili.
+- Dáta patria k hlavnej časti adresy (`lucia-ship-it.github.io`). Premenovanie repozitára ich zachová, ale stará adresa prestane fungovať a ikonu na ploche treba pridať znova. Zmena účtu alebo vlastná doména by šatník vyprázdnila.
 - Pri prvom odstraňovaní pozadia sa stiahne AI model (desiatky MB). Je lepšie byť na Wi-Fi.
 - Odstraňovanie pozadia používa knižnicu od IMG.LY (licencia AGPL-3.0).
