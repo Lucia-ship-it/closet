@@ -48,6 +48,7 @@ features she needs herself.
   empty. Do such changes early, while there is little data, and ideally after an export/backup exists.
   All links in the code are relative, so a rename breaks nothing in the code itself; update the
   URLs in these notes and in `README.md`.
+  **Decision (user): the address stays `https://lucia-ship-it.github.io/closet/`.**
 - **I cannot push** (GitHub asks for a login I must not enter). Workflow: I make the change, test it,
   bump the `?v=NN` number, **commit locally**, and tell the user to push from VS Code
   (*Source Control → Sync Changes*). Pages updates a minute or two after the push; the installed
